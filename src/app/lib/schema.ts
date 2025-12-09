@@ -34,7 +34,7 @@ export const formSchema = z.object({
   
   // Section 4
   currentChallenges: z.array(z.enum(challengesOptions)).optional(),
-  biggestPainPoint: z.string().min(1, "This field is required.").max(300, "Cannot exceed 300 characters."),
+  biggestPainPoint: z.string().max(300, "Cannot exceed 300 characters.").optional(),
 
   // Section 5
   errorRate: z.coerce.number({ invalid_type_error: "Must be a number" }).min(0, "Must be positive").max(100, "Percentage must be between 0 and 100."),

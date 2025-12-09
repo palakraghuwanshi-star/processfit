@@ -67,7 +67,7 @@ export async function getAiAnalysis(analysisId: string) {
             complaints: formData.stakeholderComplaints,
             growthLimit: formData.growthLimitation,
             roiTimeline: formData.expectedROI,
-            biggestPainPoint: formData.biggestPainPoint,
+            biggestPainPoint: formData.biggestPainPoint || "Not provided.",
             currentChallenges: formData.currentChallenges || [],
         },
         scores: {

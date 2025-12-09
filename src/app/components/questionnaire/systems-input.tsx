@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useFormContext, useFieldArray, Controller } from "react-hook-form";
@@ -31,7 +32,7 @@ export function SystemsInput() {
   return (
     <div className="space-y-4">
       <div>
-        <FormLabel>Systems Involved</FormLabel>
+        <FormLabel>List the systems this process uses</FormLabel>
         <p className="text-sm text-muted-foreground">List the systems this process uses.</p>
       </div>
       <div className="space-y-4">
@@ -68,7 +69,7 @@ export function SystemsInput() {
                     name={`systems.${index}.name`}
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>System Name</FormLabel>
+                        <FormLabel>System name</FormLabel>
                         <FormControl>
                           <Input placeholder="e.g., SAP" {...field} />
                         </FormControl>
@@ -110,7 +111,7 @@ export function SystemsInput() {
                       name={`systems.${index}.isCloud`}
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Is it cloud-based with login?</FormLabel>
+                          <FormLabel>Is it cloud-based with SSO/username login?</FormLabel>
                           <Select onValueChange={field.onChange} defaultValue={field.value}>
                             <FormControl>
                               <SelectTrigger>
@@ -145,3 +146,5 @@ export function SystemsInput() {
     </div>
   );
 }
+
+    

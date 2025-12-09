@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -5,7 +6,6 @@ import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  AlertCircle,
   FileText,
   DollarSign,
   HeartPulse,
@@ -214,28 +214,28 @@ const Section1 = () => (
     <FormSection title="Process Details" description="Let's start with some basic information about your organization and the process.">
         <FormField name="organizationName" render={({ field }) => (
             <FormItem>
-                <FormLabel>Organization Name</FormLabel>
+                <FormLabel>What is your organization name?</FormLabel>
                 <FormControl><Input placeholder="e.g., Acme Corporation" {...field} /></FormControl>
                 <FormMessage />
             </FormItem>
         )} />
         <FormField name="yourName" render={({ field }) => (
             <FormItem>
-                <FormLabel>Your Name</FormLabel>
+                <FormLabel>What is your name?</FormLabel>
                 <FormControl><Input placeholder="e.g., John Smith" {...field} /></FormControl>
                 <FormMessage />
             </FormItem>
         )} />
         <FormField name="processName" render={({ field }) => (
             <FormItem>
-                <FormLabel>Process Name</FormLabel>
+                <FormLabel>What is the name of the process you want to automate?</FormLabel>
                 <FormControl><Input placeholder="e.g., Purchase Requisition to Purchase Order" {...field} /></FormControl>
                 <FormMessage />
             </FormItem>
         )} />
         <FormField name="industry" render={({ field }) => (
             <FormItem>
-                <FormLabel>Industry</FormLabel>
+                <FormLabel>What industry is your organization in?</FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl><SelectTrigger><SelectValue placeholder="Select an industry" /></SelectTrigger></FormControl>
                     <SelectContent>{Options.industryOptions.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}</SelectContent>
@@ -245,8 +245,8 @@ const Section1 = () => (
         )} />
         <FormField name="processDescription" render={({ field }) => (
             <FormItem>
-                <FormLabel>Process Description</FormLabel>
-                <FormControl><Textarea placeholder="Describe the workflow step-by-step..." {...field} rows={6} /></FormControl>
+                <FormLabel>Please describe this process, including the main steps and systems involved</FormLabel>
+                <FormControl><Textarea placeholder={`Describe the workflow step-by-step and mention which systems are used in each step. For example:\n\nRequester submits PR in SAP\nManager approves in email\nProcurement team creates PO in Coupa\nPO sent to vendor via email...`} {...field} rows={6} /></FormControl>
                 <FormDescription>Include as much detail as possible - this helps us understand your process better.</FormDescription>
                 <FormMessage />
             </FormItem>
@@ -258,14 +258,14 @@ const Section2 = () => (
     <FormSection title="Volume & Scale" description="How large and frequent is this process?">
         <FormField name="monthlyVolume" render={({ field }) => (
             <FormItem>
-                <FormLabel>Monthly Transaction Volume</FormLabel>
+                <FormLabel>How many transactions does this process handle per month?</FormLabel>
                 <FormControl><Input type="number" placeholder="e.g., 5000" {...field} /></FormControl>
                 <FormMessage />
             </FormItem>
         )} />
         <FormField name="processFrequency" render={({ field }) => (
             <FormItem>
-                <FormLabel>Process Frequency</FormLabel>
+                <FormLabel>How often does this process run?</FormLabel>
                 <FormControl>
                     <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="space-y-2">
                         {Options.processFrequencyOptions.map(o => (
@@ -284,27 +284,30 @@ const Section2 = () => (
 
 const Section3 = () => (
     <FormSection title="Cost & Efficiency" description="Understand the financial and time impact of the process.">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <FormField name="teamSize" render={({ field }) => (
-                <FormItem>
-                    <FormLabel>Number of people (monthly)</FormLabel>
-                    <FormControl><Input type="number" placeholder="e.g., 4" {...field} /></FormControl>
-                    <FormMessage />
-                </FormItem>
-            )} />
-            <FormField name="timePercentage" render={({ field }) => (
-                <FormItem>
-                    <FormLabel>Avg. % of time spent</FormLabel>
-                    <FormControl><Input type="number" placeholder="e.g., 50" endIcon="%" {...field} /></FormControl>
-                    <FormMessage />
-                </FormItem>
-            )} />
-        </div>
-        <FormDescription>Consider all team members involved, even if part-time on this process.</FormDescription>
+        <FormItem>
+             <FormLabel>How many people work on this process in a typical month, and what percentage of their time do they spend on it?</FormLabel>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-2">
+                <FormField name="teamSize" render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Number of people (monthly)</FormLabel>
+                        <FormControl><Input type="number" placeholder="e.g., 4" {...field} /></FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )} />
+                <FormField name="timePercentage" render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Average % of their monthly time spent</FormLabel>
+                        <FormControl><Input type="number" placeholder="e.g., 50" endIcon="%" {...field} /></FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )} />
+            </div>
+            <FormDescription>Consider all team members involved - even if they only spend part of their time on this process.</FormDescription>
+        </FormItem>
 
         <FormField name="averageProcessingTime" render={({ field }) => (
             <FormItem>
-                <FormLabel>Average Processing Time per Transaction</FormLabel>
+                <FormLabel>On average, how long does it take to complete one transaction from start to finish?</FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl><SelectTrigger><SelectValue placeholder="Select a time range" /></SelectTrigger></FormControl>
                     <SelectContent>{Options.processingTimeOptions.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}</SelectContent>
@@ -314,9 +317,9 @@ const Section3 = () => (
         )} />
         <FormField name="costPerTransaction" render={({ field }) => (
             <FormItem>
-                <FormLabel>Estimated Cost per Transaction</FormLabel>
+                <FormLabel>What is the estimated cost to process a single transaction?</FormLabel>
                 <FormControl><Input type="number" placeholder="e.g., 25" startIcon="$" {...field} /></FormControl>
-                 <FormDescription>If unsure, estimate: (Total monthly process cost) / (Monthly transaction volume)</FormDescription>
+                 <FormDescription>Include labor time, overhead, system costs, and any direct costs for one transaction. If unsure, estimate: (Total monthly process cost) ÷ (Monthly transaction volume)</FormDescription>
                 <FormMessage />
             </FormItem>
         )} />
@@ -327,7 +330,7 @@ const Section4 = () => (
     <FormSection title="Pain Points" description="Help us understand the challenges you're facing.">
         <FormField name="currentChallenges" render={({ field }) => (
             <FormItem>
-                <FormLabel>Main Challenges</FormLabel>
+                <FormLabel>What are the main challenges with this process?</FormLabel>
                  <FormDescription>Select all that apply.</FormDescription>
                 <div className="space-y-2 pt-2">
                     {Options.challengesOptions.map((item) => (
@@ -353,7 +356,7 @@ const Section4 = () => (
         )} />
         <FormField name="biggestPainPoint" render={({ field }) => (
             <FormItem>
-                <FormLabel>Biggest Pain Point</FormLabel>
+                <FormLabel>What is the single biggest problem or frustration with this process?</FormLabel>
                 <FormControl><Textarea placeholder="Describe your top pain point..." {...field} rows={4} /></FormControl>
                 <FormMessage />
             </FormItem>
@@ -365,14 +368,14 @@ const Section5 = () => (
     <FormSection title="Risk & Compliance" description="Assess the process's exposure to errors and regulations.">
          <FormField name="errorRate" render={({ field }) => (
             <FormItem>
-                <FormLabel>Rework/Error Rate</FormLabel>
+                <FormLabel>Approximately what percentage of transactions require rework due to errors?</FormLabel>
                 <FormControl><Input type="number" placeholder="e.g., 15" endIcon="%" {...field} /></FormControl>
                 <FormMessage />
             </FormItem>
         )} />
          <FormField name="complianceRequirements" render={({ field }) => (
             <FormItem>
-                <FormLabel>Compliance Requirements</FormLabel>
+                <FormLabel>What compliance or regulatory requirements apply to this process?</FormLabel>
                 <FormDescription>Select all that apply.</FormDescription>
                 <div className="space-y-2 pt-2">
                     {Options.complianceOptions.map(item => (
@@ -398,7 +401,7 @@ const Section5 = () => (
         )} />
          <FormField name="impactOfDelays" render={({ field }) => (
             <FormItem>
-                <FormLabel>Impact of Delays</FormLabel>
+                <FormLabel>What happens when this process is delayed?</FormLabel>
                 <FormControl>
                     <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="space-y-2">
                         {Options.delayImpactOptions.map(o => (
@@ -419,7 +422,7 @@ const Section6 = () => (
     <FormSection title="Feasibility" description="Let's determine how automatable your process is.">
         <FormField name="processStandardization" render={({ field }) => (
             <FormItem>
-                <FormLabel>Process Standardization Rate</FormLabel>
+                <FormLabel>What percentage of transactions follow the exact same steps?</FormLabel>
                 <FormControl><Input type="number" placeholder="e.g., 85" endIcon="%" {...field} /></FormControl>
                 <FormDescription>What percentage of transactions follow the exact same steps?</FormDescription>
                 <FormMessage />
@@ -427,7 +430,7 @@ const Section6 = () => (
         )} />
         <FormField name="documentationStatus" render={({ field }) => (
             <FormItem>
-                <FormLabel>Documentation Status (SOPs)</FormLabel>
+                <FormLabel>Do you have documented procedures (SOPs) for this process?</FormLabel>
                 <FormControl>
                     <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="space-y-2">
                         {Options.sopStatusOptions.map(o => (
@@ -443,7 +446,7 @@ const Section6 = () => (
         )} />
         <FormField name="exceptionHandling" render={({ field }) => (
             <FormItem>
-                <FormLabel>Exception Rate</FormLabel>
+                <FormLabel>What percentage of transactions require special handling or don't follow the standard process?</FormLabel>
                 <FormControl><Input type="number" placeholder="e.g., 12" endIcon="%" {...field} /></FormControl>
                 <FormDescription>What percentage of transactions require special handling?</FormDescription>
                 <FormMessage />
@@ -452,7 +455,7 @@ const Section6 = () => (
         <SystemsInput />
         <FormField name="systemAccess" render={({ field }) => (
             <FormItem>
-                <FormLabel>System Access</FormLabel>
+                <FormLabel>How are these systems accessed?</FormLabel>
                  <FormControl>
                     <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="space-y-2">
                         {Options.systemAccessOptions.map(o => (
@@ -473,7 +476,7 @@ const Section7 = () => (
     <FormSection title="Strategic Impact" description="How does this process affect the broader business goals?">
          <FormField name="processBottleneck" render={({ field }) => (
             <FormItem>
-                <FormLabel>Process Bottleneck</FormLabel>
+                <FormLabel>Does this process create bottlenecks for other operations?</FormLabel>
                 <FormControl>
                     <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="space-y-2">
                         {Options.bottleneckOptions.map(o => (
@@ -489,7 +492,7 @@ const Section7 = () => (
         )} />
          <FormField name="stakeholderComplaints" render={({ field }) => (
             <FormItem>
-                <FormLabel>Stakeholder Complaints</FormLabel>
+                <FormLabel>How often do you receive complaints about this process?</FormLabel>
                 <FormControl>
                     <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="space-y-2">
                         {Options.complaintsOptions.map(o => (
@@ -505,7 +508,7 @@ const Section7 = () => (
         )} />
          <FormField name="growthLimitation" render={({ field }) => (
             <FormItem>
-                <FormLabel>Growth Limitation</FormLabel>
+                <FormLabel>Is this manual process limiting your ability to scale or grow?</FormLabel>
                 <FormControl>
                     <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="space-y-2">
                         {Options.growthLimitOptions.map(o => (
@@ -521,7 +524,7 @@ const Section7 = () => (
         )} />
          <FormField name="expectedROI" render={({ field }) => (
             <FormItem>
-                <FormLabel>Expected ROI Payback</FormLabel>
+                <FormLabel>Based on expected savings, when do you estimate payback?</FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl><SelectTrigger><SelectValue placeholder="Select a timeline" /></SelectTrigger></FormControl>
                     <SelectContent>{Options.roiTimelineOptions.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}</SelectContent>
@@ -531,3 +534,5 @@ const Section7 = () => (
         )} />
     </FormSection>
 );
+
+    

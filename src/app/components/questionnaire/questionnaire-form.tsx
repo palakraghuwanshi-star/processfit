@@ -258,7 +258,11 @@ const Section1 = () => (
             <FormField name="processDescription" render={({ field }) => (
                 <FormItem>
                     <FormLabel>Please describe this process, including the main steps and systems involved</FormLabel>
-                    <FormControl><Textarea placeholder="Describe the workflow step-by-step and mention which systems are used in each step. For example: 1. Requester submits PR in SAP 2. Manager approves in email 3. Procurement team creates PO in Coupa..." {...field} rows={5} /></FormControl>
+                    <FormControl><Textarea placeholder="Describe the workflow step-by-step and mention which systems are used in each step. For example:
+1. Requester submits PR in SAP
+2. Manager approves in email
+3. Procurement team creates PO in Coupa
+4. PO sent to vendor via email..." {...field} rows={5} /></FormControl>
                     <FormDescription className="flex items-center gap-1.5"><Info className="h-3 w-3"/>Include as much detail as possible - this helps us understand your process better</FormDescription>
                     <FormMessage />
                 </FormItem>
@@ -307,12 +311,14 @@ const Section3 = () => (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-1">
                     <FormField name="teamSize" render={({ field }) => (
                         <FormItem>
+                             <FormLabel className="font-normal text-muted-foreground">Number of people (monthly)</FormLabel>
                             <FormControl><Input type="number" placeholder="e.g., 4" {...field} /></FormControl>
                             <FormMessage />
                         </FormItem>
                     )} />
                     <FormField name="timePercentage" render={({ field }) => (
                         <FormItem>
+                            <FormLabel className="font-normal text-muted-foreground">Average % of their monthly time spent on this process</FormLabel>
                             <FormControl><Input type="number" placeholder="e.g., 50" endIcon="%" {...field} /></FormControl>
                             <FormMessage />
                         </FormItem>
@@ -568,3 +574,5 @@ const Section7 = () => (
         </div>
     </div>
 );
+
+    

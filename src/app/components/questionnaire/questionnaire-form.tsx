@@ -13,19 +13,17 @@ import {
   Construction,
   TrendingUp,
   Loader2,
-  ChevronLeft,
-  ChevronRight,
-  Send,
+  ArrowLeft,
+  ArrowRight,
+  Info,
 } from "lucide-react";
 
 import { formSchema, type FormValues } from "@/app/lib/schema";
 import { submitQuestionnaire } from "@/app/actions";
 import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
-import { Card, CardContent } from "@/components/ui/card";
-import { FormSection } from "./form-section";
 import { SystemsInput } from "./systems-input";
 
 import {
@@ -90,6 +88,10 @@ const formSections = [
 
 type FieldName = (typeof formSections)[number]["fields"][number];
 
+function FormSectionHeader({ title }: { title: string }) {
+    return <h2 className="text-xl font-semibold text-foreground mb-6">{title}</h2>;
+}
+
 export function QuestionnaireForm() {
   const [currentStep, setCurrentStep] = React.useState(0);
   const [isPending, startTransition] = React.useTransition();
@@ -139,400 +141,430 @@ export function QuestionnaireForm() {
       await submitQuestionnaire(data);
     });
   };
-  
-  const progress = ((currentStep + 1) / formSections.length) * 100;
-  const CurrentIcon = formSections[currentStep].icon;
 
   return (
     <FormProvider {...form}>
-      <Card className="border-none shadow-none bg-transparent">
-        <CardContent className="p-0">
-          <div className="mb-6">
-            <Progress value={progress} className="h-2" />
-            <div className="flex justify-between items-center mt-2">
-                <p className="text-sm text-muted-foreground">Step {currentStep + 1} of {formSections.length}</p>
-                <div className="flex items-center gap-2 text-sm font-medium text-primary">
-                    <CurrentIcon className="h-4 w-4"/>
-                    <span>{formSections[currentStep].title}</span>
-                </div>
+        <div className="mb-8 border-b">
+            <div className="flex justify-center space-x-8">
+                {formSections.map((section, index) => (
+                    <button
+                        key={section.title}
+                        onClick={() => setCurrentStep(index)}
+                        className={cn(
+                            "pb-3 text-sm font-medium text-muted-foreground transition-colors",
+                            currentStep === index ? "text-primary border-b-2 border-primary" : "hover:text-foreground"
+                        )}
+                        disabled={isPending}
+                    >
+                        {section.title}
+                    </button>
+                ))}
             </div>
-          </div>
+        </div>
 
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-            <AnimatePresence mode="wait">
-                <motion.div
-                    key={currentStep}
-                    initial={{ opacity: 0, x: 50 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -50 }}
-                    transition={{ duration: 0.3 }}
-                >
-                    {currentStep === 0 && <Section1 />}
-                    {currentStep === 1 && <Section2 />}
-                    {currentStep === 2 && <Section3 />}
-                    {currentStep === 3 && <Section4 />}
-                    {currentStep === 4 && <Section5 />}
-                    {currentStep === 5 && <Section6 />}
-                    {currentStep === 6 && <Section7 />}
-                </motion.div>
-            </AnimatePresence>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 mt-12">
+        <AnimatePresence mode="wait">
+            <motion.div
+                key={currentStep}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.2 }}
+            >
+                {currentStep === 0 && <Section1 />}
+                {currentStep === 1 && <Section2 />}
+                {currentStep === 2 && <Section3 />}
+                {currentStep === 3 && <Section4 />}
+                {currentStep === 4 && <Section5 />}
+                {currentStep === 5 && <Section6 />}
+                {currentStep === 6 && <Section7 />}
+            </motion.div>
+        </AnimatePresence>
 
-            <div className="flex justify-between items-center pt-6 border-t">
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={prevStep}
-                disabled={currentStep === 0 || isPending}
-              >
-                <ChevronLeft className="mr-2 h-4 w-4" /> Back
-              </Button>
-
-              {currentStep < formSections.length - 1 ? (
-                <Button type="button" onClick={nextStep} disabled={isPending}>
-                  Next <ChevronRight className="ml-2 h-4 w-4" />
-                </Button>
-              ) : (
-                <Button type="submit" disabled={isPending}>
-                  {isPending ? (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  ) : (
-                    <Send className="mr-2 h-4 w-4" />
-                  )}
-                  Submit for Analysis
-                </Button>
-              )}
+        <div className="flex justify-between items-center pt-8 mt-12">
+            <div>
+                {currentStep > 0 && (
+                     <Button
+                        type="button"
+                        variant="ghost"
+                        onClick={prevStep}
+                        disabled={isPending}
+                        className="text-muted-foreground"
+                    >
+                        <ArrowLeft className="mr-2 h-4 w-4" /> Previous
+                    </Button>
+                )}
             </div>
-          </form>
-        </CardContent>
-      </Card>
+
+            {currentStep < formSections.length - 1 ? (
+            <Button type="button" onClick={nextStep} disabled={isPending}>
+                Next <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+            ) : (
+            <Button type="submit" disabled={isPending}>
+                {isPending ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                "Submit for Analysis"
+                )}
+            </Button>
+            )}
+        </div>
+        </form>
     </FormProvider>
   );
 }
 
 // Each section is a separate component for clarity
 const Section1 = () => (
-    <FormSection title="Process Details" description="Let's start with some basic information about your organization and the process.">
-        <FormField name="organizationName" render={({ field }) => (
-            <FormItem>
-                <FormLabel>What is your organization name?</FormLabel>
-                <FormControl><Input placeholder="e.g., Acme Corporation" {...field} /></FormControl>
-                <FormMessage />
-            </FormItem>
-        )} />
-        <FormField name="yourName" render={({ field }) => (
-            <FormItem>
-                <FormLabel>What is your name?</FormLabel>
-                <FormControl><Input placeholder="e.g., John Smith" {...field} /></FormControl>
-                <FormMessage />
-            </FormItem>
-        )} />
-        <FormField name="processName" render={({ field }) => (
-            <FormItem>
-                <FormLabel>What is the name of the process you want to automate?</FormLabel>
-                <FormControl><Input placeholder="e.g., Purchase Requisition to Purchase Order" {...field} /></FormControl>
-                <FormMessage />
-            </FormItem>
-        )} />
-        <FormField name="industry" render={({ field }) => (
-            <FormItem>
-                <FormLabel>What industry is your organization in?</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl><SelectTrigger><SelectValue placeholder="Select an industry" /></SelectTrigger></FormControl>
-                    <SelectContent>{Options.industryOptions.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}</SelectContent>
-                </Select>
-                <FormMessage />
-            </FormItem>
-        )} />
-        <FormField name="processDescription" render={({ field }) => (
-            <FormItem>
-                <FormLabel>Please describe this process, including the main steps and systems involved</FormLabel>
-                <FormControl><Textarea placeholder={`Describe the workflow step-by-step and mention which systems are used in each step. For example:\n\nRequester submits PR in SAP\nManager approves in email\nProcurement team creates PO in Coupa\nPO sent to vendor via email...`} {...field} rows={6} /></FormControl>
-                <FormDescription>Include as much detail as possible - this helps us understand your process better.</FormDescription>
-                <FormMessage />
-            </FormItem>
-        )} />
-    </FormSection>
-);
-
-const Section2 = () => (
-    <FormSection title="Volume & Scale" description="How large and frequent is this process?">
-        <FormField name="monthlyVolume" render={({ field }) => (
-            <FormItem>
-                <FormLabel>How many transactions does this process handle per month?</FormLabel>
-                <FormControl><Input type="number" placeholder="e.g., 5000" {...field} /></FormControl>
-                <FormMessage />
-            </FormItem>
-        )} />
-        <FormField name="processFrequency" render={({ field }) => (
-            <FormItem>
-                <FormLabel>How often does this process run?</FormLabel>
-                <FormControl>
-                    <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="space-y-2">
-                        {Options.processFrequencyOptions.map(o => (
-                            <FormItem key={o} className="flex items-center space-x-3 space-y-0">
-                                <FormControl><RadioGroupItem value={o} /></FormControl>
-                                <FormLabel className="font-normal">{o}</FormLabel>
-                            </FormItem>
-                        ))}
-                    </RadioGroup>
-                </FormControl>
-                <FormMessage />
-            </FormItem>
-        )} />
-    </FormSection>
-);
-
-const Section3 = () => (
-    <FormSection title="Cost & Efficiency" description="Understand the financial and time impact of the process.">
-        <FormItem>
-             <FormLabel>How many people work on this process in a typical month, and what percentage of their time do they spend on it?</FormLabel>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-2">
-                <FormField name="teamSize" render={({ field }) => (
+    <div>
+        <FormSectionHeader title="Process Details" />
+        <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField name="organizationName" render={({ field }) => (
                     <FormItem>
-                        <FormLabel>Number of people (monthly)</FormLabel>
-                        <FormControl><Input type="number" placeholder="e.g., 4" {...field} /></FormControl>
+                        <FormLabel>What is your organization name?</FormLabel>
+                        <FormControl><Input placeholder="e.g., Acme Corporation" {...field} /></FormControl>
                         <FormMessage />
                     </FormItem>
                 )} />
-                <FormField name="timePercentage" render={({ field }) => (
+                <FormField name="yourName" render={({ field }) => (
                     <FormItem>
-                        <FormLabel>Average % of their monthly time spent</FormLabel>
-                        <FormControl><Input type="number" placeholder="e.g., 50" endIcon="%" {...field} /></FormControl>
+                        <FormLabel>What is your name?</FormLabel>
+                        <FormControl><Input placeholder="e.g., John Smith" {...field} /></FormControl>
                         <FormMessage />
                     </FormItem>
                 )} />
             </div>
-            <FormDescription>Consider all team members involved - even if they only spend part of their time on this process.</FormDescription>
-        </FormItem>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                 <FormField name="processName" render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>What is the name of the process you want to automate?</FormLabel>
+                        <FormControl><Input placeholder="e.g., Purchase Requisition to Purchase Order" {...field} /></FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )} />
+                <FormField name="industry" render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>What industry is your organization in?</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl><SelectTrigger><SelectValue placeholder="Select an industry" /></SelectTrigger></FormControl>
+                            <SelectContent>{Options.industryOptions.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}</SelectContent>
+                        </Select>
+                        <FormMessage />
+                    </FormItem>
+                )} />
+            </div>
+            <FormField name="processDescription" render={({ field }) => (
+                <FormItem>
+                    <FormLabel>Please describe this process, including the main steps and systems involved</FormLabel>
+                    <FormControl><Textarea placeholder="Describe the workflow step-by-step and mention which systems are used in each step. For example: 1. Requester submits PR in SAP 2. Manager approves in email 3. Procurement team creates PO in Coupa..." {...field} rows={5} /></FormControl>
+                    <FormDescription className="flex items-center gap-1.5"><Info className="h-3 w-3"/>Include as much detail as possible - this helps us understand your process better</FormDescription>
+                    <FormMessage />
+                </FormItem>
+            )} />
+        </div>
+    </div>
+);
 
-        <FormField name="averageProcessingTime" render={({ field }) => (
+const Section2 = () => (
+    <div>
+        <FormSectionHeader title="Volume & Scale" />
+        <div className="space-y-6 max-w-md">
+            <FormField name="monthlyVolume" render={({ field }) => (
+                <FormItem>
+                    <FormLabel>How many transactions does this process handle per month?</FormLabel>
+                    <FormControl><Input type="number" placeholder="e.g., 5000" {...field} /></FormControl>
+                    <FormMessage />
+                </FormItem>
+            )} />
+            <FormField name="processFrequency" render={({ field }) => (
+                <FormItem>
+                    <FormLabel>How often does this process run?</FormLabel>
+                    <FormControl>
+                        <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="space-y-2 pt-1">
+                            {Options.processFrequencyOptions.map(o => (
+                                <FormItem key={o} className="flex items-center space-x-3 space-y-0">
+                                    <FormControl><RadioGroupItem value={o} /></FormControl>
+                                    <FormLabel className="font-normal">{o}</FormLabel>
+                                </FormItem>
+                            ))}
+                        </RadioGroup>
+                    </FormControl>
+                    <FormMessage />
+                </FormItem>
+            )} />
+        </div>
+    </div>
+);
+
+const Section3 = () => (
+     <div>
+        <FormSectionHeader title="Cost & Efficiency" />
+        <div className="space-y-6">
             <FormItem>
-                <FormLabel>On average, how long does it take to complete one transaction from start to finish?</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl><SelectTrigger><SelectValue placeholder="Select a time range" /></SelectTrigger></FormControl>
-                    <SelectContent>{Options.processingTimeOptions.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}</SelectContent>
-                </Select>
-                <FormMessage />
+                <FormLabel>How many people work on this process in a typical month, and what percentage of their time do they spend on it?</FormLabel>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-1">
+                    <FormField name="teamSize" render={({ field }) => (
+                        <FormItem>
+                            <FormControl><Input type="number" placeholder="e.g., 4" {...field} /></FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )} />
+                    <FormField name="timePercentage" render={({ field }) => (
+                        <FormItem>
+                            <FormControl><Input type="number" placeholder="e.g., 50" endIcon="%" {...field} /></FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )} />
+                </div>
+                <FormDescription className="flex items-center gap-1.5"><Info className="h-3 w-3"/>Consider all team members involved - even if they only spend part of their time on this process</FormDescription>
             </FormItem>
-        )} />
-        <FormField name="costPerTransaction" render={({ field }) => (
-            <FormItem>
-                <FormLabel>What is the estimated cost to process a single transaction?</FormLabel>
-                <FormControl><Input type="number" placeholder="e.g., 25" startIcon="$" {...field} /></FormControl>
-                 <FormDescription>Include labor time, overhead, system costs, and any direct costs for one transaction. If unsure, estimate: (Total monthly process cost) ÷ (Monthly transaction volume)</FormDescription>
-                <FormMessage />
-            </FormItem>
-        )} />
-    </FormSection>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField name="averageProcessingTime" render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>On average, how long does it take to complete one transaction from start to finish?</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl><SelectTrigger><SelectValue placeholder="Select a time range" /></SelectTrigger></FormControl>
+                            <SelectContent>{Options.processingTimeOptions.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}</SelectContent>
+                        </Select>
+                        <FormMessage />
+                    </FormItem>
+                )} />
+                <FormField name="costPerTransaction" render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>What is the estimated cost to process a single transaction?</FormLabel>
+                        <FormControl><Input type="number" placeholder="e.g., 25" startIcon="$" {...field} /></FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )} />
+            </div>
+             <FormItem>
+                <FormDescription className="flex items-center gap-1.5"><Info className="h-3 w-3"/>Include labor time, overhead, system costs, and any direct costs for one transaction. If unsure, estimate: (Total monthly process cost) ÷ (Monthly transaction volume)</FormDescription>
+             </FormItem>
+        </div>
+    </div>
 );
 
 const Section4 = () => (
-    <FormSection title="Pain Points" description="Help us understand the challenges you're facing.">
-        <FormField name="currentChallenges" render={({ field }) => (
-            <FormItem>
-                <FormLabel>What are the main challenges with this process?</FormLabel>
-                 <FormDescription>Select all that apply.</FormDescription>
-                <div className="space-y-2 pt-2">
-                    {Options.challengesOptions.map((item) => (
-                        <FormField key={item} name="currentChallenges" render={({ field }) => (
-                             <FormItem key={item} className="flex flex-row items-start space-x-3 space-y-0">
-                                <FormControl>
-                                    <Checkbox
-                                        checked={field.value?.includes(item)}
-                                        onCheckedChange={(checked) => {
-                                            return checked
-                                            ? field.onChange([...(field.value || []), item])
-                                            : field.onChange(field.value?.filter((value) => value !== item));
-                                        }}
-                                    />
-                                </FormControl>
-                                <FormLabel className="font-normal">{item}</FormLabel>
-                            </FormItem>
-                        )} />
-                    ))}
-                </div>
-                <FormMessage />
-            </FormItem>
-        )} />
-        <FormField name="biggestPainPoint" render={({ field }) => (
-            <FormItem>
-                <FormLabel>What is the single biggest problem or frustration with this process?</FormLabel>
-                <FormControl><Textarea placeholder="Describe your top pain point..." {...field} rows={4} /></FormControl>
-                <FormMessage />
-            </FormItem>
-        )} />
-    </FormSection>
+    <div>
+        <FormSectionHeader title="Pain Points" />
+        <div className="space-y-6 max-w-lg">
+            <FormField name="currentChallenges" render={() => (
+                <FormItem>
+                    <FormLabel>What are the main challenges with this process? (Select all that apply)</FormLabel>
+                    <div className="space-y-2 pt-2">
+                        {Options.challengesOptions.map((item) => (
+                            <FormField key={item} name="currentChallenges" render={({ field }) => (
+                                <FormItem key={item} className="flex flex-row items-start space-x-3 space-y-0">
+                                    <FormControl>
+                                        <Checkbox
+                                            checked={field.value?.includes(item)}
+                                            onCheckedChange={(checked) => {
+                                                return checked
+                                                ? field.onChange([...(field.value || []), item])
+                                                : field.onChange(field.value?.filter((value) => value !== item));
+                                            }}
+                                        />
+                                    </FormControl>
+                                    <FormLabel className="font-normal">{item}</FormLabel>
+                                </FormItem>
+                            )} />
+                        ))}
+                    </div>
+                    <FormMessage />
+                </FormItem>
+            )} />
+            <FormField name="biggestPainPoint" render={({ field }) => (
+                <FormItem>
+                    <FormLabel>What is the single biggest problem or frustration with this process?</FormLabel>
+                    <FormControl><Textarea placeholder="Describe your top pain point..." {...field} rows={4} /></FormControl>
+                    <FormMessage />
+                </FormItem>
+            )} />
+        </div>
+    </div>
 );
 
 const Section5 = () => (
-    <FormSection title="Risk & Compliance" description="Assess the process's exposure to errors and regulations.">
-         <FormField name="errorRate" render={({ field }) => (
-            <FormItem>
-                <FormLabel>Approximately what percentage of transactions require rework due to errors?</FormLabel>
-                <FormControl><Input type="number" placeholder="e.g., 15" endIcon="%" {...field} /></FormControl>
-                <FormMessage />
-            </FormItem>
-        )} />
-         <FormField name="complianceRequirements" render={({ field }) => (
-            <FormItem>
-                <FormLabel>What compliance or regulatory requirements apply to this process?</FormLabel>
-                <FormDescription>Select all that apply.</FormDescription>
-                <div className="space-y-2 pt-2">
-                    {Options.complianceOptions.map(item => (
-                        <FormField key={item} name="complianceRequirements" render={({ field }) => (
-                            <FormItem key={item} className="flex flex-row items-start space-x-3 space-y-0">
-                                <FormControl>
-                                    <Checkbox
-                                        checked={field.value?.includes(item)}
-                                        onCheckedChange={(checked) => {
-                                            return checked
-                                            ? field.onChange([...field.value, item])
-                                            : field.onChange(field.value?.filter((value) => value !== item));
-                                        }}
-                                    />
-                                </FormControl>
-                                <FormLabel className="font-normal">{item}</FormLabel>
-                            </FormItem>
-                        )} />
-                    ))}
-                </div>
-                <FormMessage />
-            </FormItem>
-        )} />
-         <FormField name="impactOfDelays" render={({ field }) => (
-            <FormItem>
-                <FormLabel>What happens when this process is delayed?</FormLabel>
-                <FormControl>
-                    <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="space-y-2">
-                        {Options.delayImpactOptions.map(o => (
-                            <FormItem key={o} className="flex items-center space-x-3 space-y-0">
-                                <FormControl><RadioGroupItem value={o} /></FormControl>
-                                <FormLabel className="font-normal">{o}</FormLabel>
-                            </FormItem>
+     <div>
+        <FormSectionHeader title="Risk & Compliance" />
+        <div className="space-y-6 max-w-lg">
+            <FormField name="errorRate" render={({ field }) => (
+                <FormItem>
+                    <FormLabel>Approximately what percentage of transactions require rework due to errors?</FormLabel>
+                    <FormControl><Input type="number" placeholder="e.g., 15" endIcon="%" {...field} /></FormControl>
+                    <FormMessage />
+                </FormItem>
+            )} />
+            <FormField name="complianceRequirements" render={() => (
+                <FormItem>
+                    <FormLabel>What compliance or regulatory requirements apply to this process? (Select all that apply)</FormLabel>
+                    <div className="space-y-2 pt-2">
+                        {Options.complianceOptions.map(item => (
+                            <FormField key={item} name="complianceRequirements" render={({ field }) => (
+                                <FormItem key={item} className="flex flex-row items-start space-x-3 space-y-0">
+                                    <FormControl>
+                                        <Checkbox
+                                            checked={field.value?.includes(item)}
+                                            onCheckedChange={(checked) => {
+                                                const currentValues = field.value || [];
+                                                if (checked) {
+                                                    field.onChange([...currentValues, item]);
+                                                } else {
+                                                    field.onChange(currentValues.filter((value) => value !== item));
+                                                }
+                                            }}
+                                        />
+                                    </FormControl>
+                                    <FormLabel className="font-normal">{item}</FormLabel>
+                                </FormItem>
+                            )} />
                         ))}
-                    </RadioGroup>
-                </FormControl>
-                <FormMessage />
-            </FormItem>
-        )} />
-    </FormSection>
+                    </div>
+                    <FormMessage />
+                </FormItem>
+            )} />
+            <FormField name="impactOfDelays" render={({ field }) => (
+                <FormItem>
+                    <FormLabel>What happens when this process is delayed?</FormLabel>
+                    <FormControl>
+                        <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="space-y-2 pt-1">
+                            {Options.delayImpactOptions.map(o => (
+                                <FormItem key={o} className="flex items-center space-x-3 space-y-0">
+                                    <FormControl><RadioGroupItem value={o} /></FormControl>
+                                    <FormLabel className="font-normal">{o}</FormLabel>
+                                </FormItem>
+                            ))}
+                        </RadioGroup>
+                    </FormControl>
+                    <FormMessage />
+                </FormItem>
+            )} />
+        </div>
+    </div>
 );
 
 const Section6 = () => (
-    <FormSection title="Feasibility" description="Let's determine how automatable your process is.">
-        <FormField name="processStandardization" render={({ field }) => (
-            <FormItem>
-                <FormLabel>What percentage of transactions follow the exact same steps?</FormLabel>
-                <FormControl><Input type="number" placeholder="e.g., 85" endIcon="%" {...field} /></FormControl>
-                <FormDescription>What percentage of transactions follow the exact same steps?</FormDescription>
-                <FormMessage />
-            </FormItem>
-        )} />
-        <FormField name="documentationStatus" render={({ field }) => (
-            <FormItem>
-                <FormLabel>Do you have documented procedures (SOPs) for this process?</FormLabel>
-                <FormControl>
-                    <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="space-y-2">
-                        {Options.sopStatusOptions.map(o => (
-                            <FormItem key={o} className="flex items-center space-x-3 space-y-0">
-                                <FormControl><RadioGroupItem value={o} /></FormControl>
-                                <FormLabel className="font-normal">{o}</FormLabel>
-                            </FormItem>
-                        ))}
-                    </RadioGroup>
-                </FormControl>
-                <FormMessage />
-            </FormItem>
-        )} />
-        <FormField name="exceptionHandling" render={({ field }) => (
-            <FormItem>
-                <FormLabel>What percentage of transactions require special handling or don't follow the standard process?</FormLabel>
-                <FormControl><Input type="number" placeholder="e.g., 12" endIcon="%" {...field} /></FormControl>
-                <FormDescription>What percentage of transactions require special handling?</FormDescription>
-                <FormMessage />
-            </FormItem>
-        )} />
-        <SystemsInput />
-        <FormField name="systemAccess" render={({ field }) => (
-            <FormItem>
-                <FormLabel>How are these systems accessed?</FormLabel>
-                 <FormControl>
-                    <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="space-y-2">
-                        {Options.systemAccessOptions.map(o => (
-                            <FormItem key={o} className="flex items-center space-x-3 space-y-0">
-                                <FormControl><RadioGroupItem value={o} /></FormControl>
-                                <FormLabel className="font-normal">{o}</FormLabel>
-                            </FormItem>
-                        ))}
-                    </RadioGroup>
-                </FormControl>
-                <FormMessage />
-            </FormItem>
-        )} />
-    </FormSection>
+     <div>
+        <FormSectionHeader title="Feasibility" />
+        <div className="space-y-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                <FormField name="processStandardization" render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>What percentage of transactions follow the exact same steps?</FormLabel>
+                        <FormControl><Input type="number" placeholder="e.g., 85" endIcon="%" {...field} /></FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )} />
+                <FormField name="exceptionHandling" render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>What percentage of transactions require special handling or don't follow the standard process?</FormLabel>
+                        <FormControl><Input type="number" placeholder="e.g., 12" endIcon="%" {...field} /></FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )} />
+                 <FormField name="documentationStatus" render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Do you have documented procedures (SOPs) for this process?</FormLabel>
+                        <FormControl>
+                            <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="space-y-2 pt-1">
+                                {Options.sopStatusOptions.map(o => (
+                                    <FormItem key={o} className="flex items-center space-x-3 space-y-0">
+                                        <FormControl><RadioGroupItem value={o} /></FormControl>
+                                        <FormLabel className="font-normal">{o}</FormLabel>
+                                    </FormItem>
+                                ))}
+                            </RadioGroup>
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )} />
+                 <FormField name="systemAccess" render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>How are these systems accessed?</FormLabel>
+                        <FormControl>
+                            <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="space-y-2 pt-1">
+                                {Options.systemAccessOptions.map(o => (
+                                    <FormItem key={o} className="flex items-center space-x-3 space-y-0">
+                                        <FormControl><RadioGroupItem value={o} /></FormControl>
+                                        <FormLabel className="font-normal">{o}</FormLabel>
+                                    </FormItem>
+                                ))}
+                            </RadioGroup>
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )} />
+            </div>
+            <SystemsInput />
+        </div>
+    </div>
 );
 
 const Section7 = () => (
-    <FormSection title="Strategic Impact" description="How does this process affect the broader business goals?">
-         <FormField name="processBottleneck" render={({ field }) => (
-            <FormItem>
-                <FormLabel>Does this process create bottlenecks for other operations?</FormLabel>
-                <FormControl>
-                    <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="space-y-2">
-                        {Options.bottleneckOptions.map(o => (
-                            <FormItem key={o} className="flex items-center space-x-3 space-y-0">
-                                <FormControl><RadioGroupItem value={o} /></FormControl>
-                                <FormLabel className="font-normal">{o}</FormLabel>
-                            </FormItem>
-                        ))}
-                    </RadioGroup>
-                </FormControl>
-                <FormMessage />
-            </FormItem>
-        )} />
-         <FormField name="stakeholderComplaints" render={({ field }) => (
-            <FormItem>
-                <FormLabel>How often do you receive complaints about this process?</FormLabel>
-                <FormControl>
-                    <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="space-y-2">
-                        {Options.complaintsOptions.map(o => (
-                            <FormItem key={o} className="flex items-center space-x-3 space-y-0">
-                                <FormControl><RadioGroupItem value={o} /></FormControl>
-                                <FormLabel className="font-normal">{o}</FormLabel>
-                            </FormItem>
-                        ))}
-                    </RadioGroup>
-                </FormControl>
-                <FormMessage />
-            </FormItem>
-        )} />
-         <FormField name="growthLimitation" render={({ field }) => (
-            <FormItem>
-                <FormLabel>Is this manual process limiting your ability to scale or grow?</FormLabel>
-                <FormControl>
-                    <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="space-y-2">
-                        {Options.growthLimitOptions.map(o => (
-                            <FormItem key={o} className="flex items-center space-x-3 space-y-0">
-                                <FormControl><RadioGroupItem value={o} /></FormControl>
-                                <FormLabel className="font-normal">{o}</FormLabel>
-                            </FormItem>
-                        ))}
-                    </RadioGroup>
-                </FormControl>
-                <FormMessage />
-            </FormItem>
-        )} />
-         <FormField name="expectedROI" render={({ field }) => (
-            <FormItem>
-                <FormLabel>Based on expected savings, when do you estimate payback?</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl><SelectTrigger><SelectValue placeholder="Select a timeline" /></SelectTrigger></FormControl>
-                    <SelectContent>{Options.roiTimelineOptions.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}</SelectContent>
-                </Select>
-                <FormMessage />
-            </FormItem>
-        )} />
-    </FormSection>
+    <div>
+        <FormSectionHeader title="Strategic Impact" />
+        <div className="space-y-6 max-w-lg">
+            <FormField name="processBottleneck" render={({ field }) => (
+                <FormItem>
+                    <FormLabel>Does this process create bottlenecks for other operations?</FormLabel>
+                    <FormControl>
+                        <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="space-y-2 pt-1">
+                            {Options.bottleneckOptions.map(o => (
+                                <FormItem key={o} className="flex items-center space-x-3 space-y-0">
+                                    <FormControl><RadioGroupItem value={o} /></FormControl>
+                                    <FormLabel className="font-normal">{o}</FormLabel>
+                                </FormItem>
+                            ))}
+                        </RadioGroup>
+                    </FormControl>
+                    <FormMessage />
+                </FormItem>
+            )} />
+            <FormField name="stakeholderComplaints" render={({ field }) => (
+                <FormItem>
+                    <FormLabel>How often do you receive complaints about this process?</FormLabel>
+                    <FormControl>
+                        <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="space-y-2 pt-1">
+                            {Options.complaintsOptions.map(o => (
+                                <FormItem key={o} className="flex items-center space-x-3 space-y-0">
+                                    <FormControl><RadioGroupItem value={o} /></FormControl>
+                                    <FormLabel className="font-normal">{o}</FormLabel>
+                                </FormItem>
+                            ))}
+                        </RadioGroup>
+                    </FormControl>
+                    <FormMessage />
+                </FormItem>
+            )} />
+            <FormField name="growthLimitation" render={({ field }) => (
+                <FormItem>
+                    <FormLabel>Is this manual process limiting your ability to scale or grow?</FormLabel>
+                    <FormControl>
+                        <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="space-y-2 pt-1">
+                            {Options.growthLimitOptions.map(o => (
+                                <FormItem key={o} className="flex items-center space-x-3 space-y-0">
+                                    <FormControl><RadioGroupItem value={o} /></FormControl>
+                                    <FormLabel className="font-normal">{o}</FormLabel>
+                                </FormItem>
+                            ))}
+                        </RadioGroup>
+                    </FormControl>
+                    <FormMessage />
+                </FormItem>
+            )} />
+            <FormField name="expectedROI" render={({ field }) => (
+                <FormItem>
+                    <FormLabel>Based on expected savings, when do you estimate payback?</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl><SelectTrigger><SelectValue placeholder="Select a timeline" /></SelectTrigger></FormControl>
+                        <SelectContent>{Options.roiTimelineOptions.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}</SelectContent>
+                    </Select>
+                    <FormMessage />
+                </FormItem>
+            )} />
+        </div>
+    </div>
 );
-
-    

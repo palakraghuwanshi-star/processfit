@@ -1,10 +1,9 @@
 
 "use client";
 
-import { useFormContext, useFieldArray, Controller } from "react-hook-form";
+import { useFormContext, useFieldArray } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -32,7 +31,7 @@ export function SystemsInput() {
   return (
     <div className="space-y-4">
       <div>
-        <FormLabel>List the systems this process uses</FormLabel>
+        <h3 className="text-lg font-medium">Systems Involved</h3>
         <p className="text-sm text-muted-foreground">List the systems this process uses.</p>
       </div>
       <div className="space-y-4">
@@ -146,5 +145,3 @@ export function SystemsInput() {
     </div>
   );
 }
-
-    

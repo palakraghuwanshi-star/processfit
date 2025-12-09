@@ -347,7 +347,7 @@ const Section3 = () => (
                 )} />
             </div>
              <FormItem>
-                <FormDescription className="flex items-center gap-1.5"><Info className="h-3 w-3"/>Include labor time, overhead, system costs, and any direct costs for one transaction. If unsure, estimate: (Total monthly process cost) ÷ (Monthly transaction volume)</FormDescription>
+                <FormDescription className="flex items-center gap-1.5"><Info className="h-3 w-3"/>Include labor time, overhead for one transaction. If unsure, estimate: (Total monthly process cost) ÷ (Monthly transaction volume)</FormDescription>
              </FormItem>
         </div>
     </div>
@@ -574,5 +574,3 @@ const Section7 = () => (
         </div>
     </div>
 );
-
-    

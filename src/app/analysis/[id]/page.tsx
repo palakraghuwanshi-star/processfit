@@ -17,8 +17,8 @@ import {
 } from "@/components/ui/card";
 
 
-export default function AnalysisPage({ params }: { params: { id: string } }) {
-  const data = getData(params.id);
+export default async function AnalysisPage({ params }: { params: { id: string } }) {
+  const data = await getData(params.id);
 
   if (!data) {
     return notFound();

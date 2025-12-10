@@ -20,7 +20,7 @@ export async function submitQuestionnaire(values: FormValues) {
     const id = randomUUID();
     const { scores, flags } = calculateScores(validatedFields.data);
 
-    saveData(id, {
+    await saveData(id, {
         id,
         submittedAt: new Date(),
         formData: validatedFields.data,
@@ -33,7 +33,7 @@ export async function submitQuestionnaire(values: FormValues) {
 
 
 export async function getAiAnalysis(analysisId: string) {
-    const data = getData(analysisId);
+    const data = await getData(analysisId);
     if (!data) {
         throw new Error("Analysis not found.");
     }
@@ -86,12 +86,10 @@ export async function getAiAnalysis(analysisId: string) {
     
     try {
         const aiResult = await analyzeProcess(aiInput);
-        updateWithAiData(analysisId, aiResult);
+        await updateWithAiData(analysisId, aiResult);
         return { success: true, data: aiResult };
     } catch (error) {
         console.error("AI Analysis failed:", error);
         return { success: false, error: "Failed to get AI analysis. Please try again." };
     }
 }
-
-    

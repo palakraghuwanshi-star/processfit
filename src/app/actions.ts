@@ -20,7 +20,6 @@ export async function submitQuestionnaire(values: FormValues) {
     const id = randomUUID();
     const { scores, flags } = calculateScores(validatedFields.data);
 
-    // This is now an in-memory store, it will be moved to Firestore later.
     saveData(id, {
         id,
         submittedAt: new Date(),
@@ -94,5 +93,3 @@ export async function getAiAnalysis(analysisId: string) {
         return { success: false, error: "Failed to get AI analysis. Please try again." };
     }
 }
-
-    

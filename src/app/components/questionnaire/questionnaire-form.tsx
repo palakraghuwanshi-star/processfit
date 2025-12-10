@@ -47,10 +47,6 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 
 import * as Options from "@/app/lib/form-options";
-import { useRouter } from "next/navigation";
-import { randomUUID } from "crypto";
-import { saveData } from "@/app/lib/data-store";
-import { calculateScores } from "@/app/lib/scoring";
 
 
 const formSections = [
@@ -101,7 +97,6 @@ export function QuestionnaireForm() {
   const [currentStep, setCurrentStep] = React.useState(0);
   const [isPending, startTransition] = React.useTransition();
   const { toast } = useToast();
-  const router = useRouter();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -154,18 +149,16 @@ export function QuestionnaireForm() {
 
   const onSubmit = (data: FormValues) => {
     startTransition(async () => {
-        const id = crypto.randomUUID();
-        const { scores, flags } = calculateScores(data);
-
-        saveData(id, {
-            id,
-            submittedAt: new Date(),
-            formData: data,
-            scores,
-            flags,
-        });
-
-        router.push(`/analysis/${id}`);
+        try {
+            await submitQuestionnaire(data);
+        } catch (error) {
+            console.error(error);
+            toast({
+                variant: "destructive",
+                title: "Submission Error",
+                description: "There was a problem submitting your questionnaire.",
+            });
+        }
     });
   };
 
@@ -599,5 +592,3 @@ const Section7 = () => (
         </div>
     </div>
 );
-
-    

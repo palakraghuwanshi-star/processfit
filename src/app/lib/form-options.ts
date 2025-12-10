@@ -1,3 +1,4 @@
+
 export const industryOptions = [
   "Finance & Banking",
   "Healthcare & Pharma",
@@ -36,6 +37,7 @@ export const challengesOptions = [
   "Compliance or audit concerns",
   "Poor visibility into process status",
   "Affects customer/vendor satisfaction",
+  "Other",
 ] as const;
 
 export const complianceOptions = [

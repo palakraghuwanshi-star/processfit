@@ -49,7 +49,7 @@ export const formSchema = z.object({
   exceptionHandling: z.coerce.number({ invalid_type_error: "Must be a number" }).min(0, "Must be positive").max(100, "Percentage must be between 0 and 100."),
   systems: z.array(z.object({
     name: z.string().min(1, "System name is required."),
-    hasApi: z.enum(["Yes", "No"], { required_error: "Please select an option." }),
+    hasApi: z.enum(["Yes", "No", "Don't know"], { required_error: "Please select an option." }),
     isCloud: z.enum(["Yes", "No"]).optional(),
   })).min(1, "Please list at least one system."),
   systemAccess: z.enum(systemAccessOptions, { required_error: "Please select system access type." }),

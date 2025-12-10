@@ -71,7 +71,8 @@ const scoreCompliance = (reqs: string[]): number => {
     return 0;
 };
 
-const scoreDelayImpact = (impact: string): number => {
+const scoreDelayImpact = (impact: string | undefined): number => {
+    if (!impact) return 0;
     switch (impact) {
         case "Minimal impact, no direct costs": return 1;
         case "Some operational inconvenience": return 3;
@@ -164,9 +165,13 @@ export const calculateScores = (data: FormValues): { scores: AnalysisScores, fla
     const excScore = scoreExceptionRate(data.exceptionHandling);
 
     let apiScore = 0;
-    if (data.systems.every(s => s.hasApi === "Yes")) apiScore = 10;
-    else if (data.systems.every(s => s.hasApi === "No")) apiScore = 2;
-    else apiScore = 6;
+    if (data.systems.every(s => s.hasApi === "Yes")) {
+        apiScore = 10;
+    } else if (data.systems.some(s => s.hasApi === "No" || s.hasApi === "Don't know")) {
+        apiScore = 4; // Penalize for any "No" or "Don't know"
+    } else {
+        apiScore = 6; // Mixed
+    }
     
     let accessScore = 0;
     switch (data.systemAccess) {
@@ -189,6 +194,8 @@ export const calculateScores = (data: FormValues): { scores: AnalysisScores, fla
             flags.push(`❌ Integration blocker: ${sys.name} is not cloud-based and has no API`);
         } else if (sys.hasApi === 'No') {
             flags.push(`⚠️ System without API: ${sys.name}`);
+        } else if (sys.hasApi === "Don't know") {
+            flags.push(`❓ API status unknown for ${sys.name}. Further investigation needed.`);
         }
     });
     if (data.systemAccess === "All systems are internal/intranet only") {
@@ -215,7 +222,7 @@ export const calculateScores = (data: FormValues): { scores: AnalysisScores, fla
         color = "green";
     } else if (businessImpact >= 90 && feasibility < 25) {
         category = "STRATEGIC LONG-TERM";
-        color = "yellow";
+        color = "blue";
     } else if (businessImpact < 90 && feasibility >= 25) {
         category = "INCREMENTAL GAINS";
         color = "orange";

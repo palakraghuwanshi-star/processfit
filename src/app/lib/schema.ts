@@ -35,11 +35,11 @@ export const formSchema = z.object({
   // Section 4
   currentChallenges: z.array(z.enum(challengesOptions)).optional(),
   biggestPainPoint: z.string().max(300, "Cannot exceed 300 characters.").optional(),
+  impactOfDelays: z.enum(delayImpactOptions, { required_error: "Please select an impact level." }),
 
   // Section 5
   errorRate: z.coerce.number({ invalid_type_error: "Must be a number" }).min(0, "Must be positive").max(100, "Percentage must be between 0 and 100."),
   complianceRequirements: z.array(z.enum(complianceOptions)).min(1, "Please select at least one compliance option."),
-  impactOfDelays: z.enum(delayImpactOptions, { required_error: "Please select an impact level." }),
   
   // Section 6 (Feasibility)
   processStandardization: z.coerce.number({ invalid_type_error: "Must be a number" }).min(0, "Must be positive").max(100, "Percentage must be between 0 and 100."),
@@ -60,5 +60,3 @@ export const formSchema = z.object({
 });
 
 export type FormValues = z.infer<typeof formSchema>;
-
-    

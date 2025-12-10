@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import * as React from 'react';
@@ -73,12 +72,12 @@ const formSections = [
   {
     title: 'Pain Points',
     icon: HeartPulse,
-    fields: ['currentChallenges', 'biggestPainPoint'],
+    fields: ['currentChallenges', 'biggestPainPoint', 'impactOfDelays'],
   },
   {
     title: 'Risk & Compliance',
     icon: AlertTriangle,
-    fields: ['errorRate', 'complianceRequirements', 'impactOfDelays'],
+    fields: ['errorRate', 'complianceRequirements'],
   },
   {
     title: 'Feasibility',
@@ -583,6 +582,31 @@ const Section4 = () => (
           </FormItem>
         )}
       />
+      <FormField
+        name="impactOfDelays"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>What happens when this process is delayed?</FormLabel>
+            <FormControl>
+              <RadioGroup
+                onValueChange={field.onChange}
+                defaultValue={field.value}
+                className="space-y-2 pt-1"
+              >
+                {Options.delayImpactOptions.map(o => (
+                  <FormItem key={o} className="flex items-center space-x-3 space-y-0">
+                    <FormControl>
+                      <RadioGroupItem value={o} />
+                    </FormControl>
+                    <FormLabel className="font-normal">{o}</FormLabel>
+                  </FormItem>
+                ))}
+              </RadioGroup>
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
     </div>
   </div>
 );
@@ -652,31 +676,6 @@ const Section5 = () => (
           </FormItem>
         )}
       />
-      <FormField
-        name="impactOfDelays"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>What happens when this process is delayed?</FormLabel>
-            <FormControl>
-              <RadioGroup
-                onValueChange={field.onChange}
-                defaultValue={field.value}
-                className="space-y-2 pt-1"
-              >
-                {Options.delayImpactOptions.map(o => (
-                  <FormItem key={o} className="flex items-center space-x-3 space-y-0">
-                    <FormControl>
-                      <RadioGroupItem value={o} />
-                    </FormControl>
-                    <FormLabel className="font-normal">{o}</FormLabel>
-                  </FormItem>
-                ))}
-              </RadioGroup>
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
     </div>
   </div>
 );
@@ -685,7 +684,7 @@ const Section6 = () => (
   <div className="space-y-8">
     <h2 className="text-xl font-semibold text-foreground">Feasibility</h2>
     <div className="space-y-6">
-      <FormField
+       <FormField
         name="documentationStatus"
         render={({ field }) => (
           <FormItem>
@@ -710,8 +709,7 @@ const Section6 = () => (
           </FormItem>
         )}
       />
-
-      <FormField
+       <FormField
         name="processStandardization"
         render={({ field }) => (
           <FormItem>
@@ -729,7 +727,6 @@ const Section6 = () => (
           </FormItem>
         )}
       />
-
       <FormField
         name="exceptionHandling"
         render={({ field }) => (

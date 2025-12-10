@@ -122,7 +122,7 @@ export function QuestionnaireForm() {
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
-    mode: 'onSubmit',
+    mode: 'onTouched',
     defaultValues: {
       organizationName: '',
       yourName: '',
@@ -248,8 +248,8 @@ export function QuestionnaireForm() {
             {currentStep === 0 && <Section1 />}
             {currentStep === 1 && <Section2 />}
             {currentStep === 2 && <Section3 />}
-            {currentStep === 4 && <Section5 />}
             {currentStep === 3 && <Section4 />}
+            {currentStep === 4 && <Section5 />}
             {currentStep === 5 && <Section6 />}
             {currentStep === 6 && <Section7 />}
           </motion.div>
@@ -818,46 +818,47 @@ const Section6 = () => {
               )}
             </AnimatePresence>
         </div>
-
-        <FormField
-          name="processStandardization"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>What percentage of transactions follow the exact same steps?</FormLabel>
-              <FormControl>
-                <Input
-                  type="number"
-                  placeholder="e.g., 85"
-                  endIcon="%"
-                  {...field}
-                  value={field.value ?? ''}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          name="exceptionHandling"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>
-                What percentage of transactions require special handling or don&apos;t follow the
-                standard process?
-              </FormLabel>
-              <FormControl>
-                <Input
-                  type="number"
-                  placeholder="e.g., 12"
-                  endIcon="%"
-                  {...field}
-                  value={field.value ?? ''}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="space-y-4">
+          <FormField
+            name="processStandardization"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>What percentage of transactions follow the exact same steps?</FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    placeholder="e.g., 85"
+                    endIcon="%"
+                    {...field}
+                    value={field.value ?? ''}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            name="exceptionHandling"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  What percentage of transactions require special handling or don&apos;t follow the
+                  standard process?
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    placeholder="e.g., 12"
+                    endIcon="%"
+                    {...field}
+                    value={field.value ?? ''}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
         <SystemsInput />
 

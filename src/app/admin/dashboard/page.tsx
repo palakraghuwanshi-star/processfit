@@ -36,18 +36,18 @@ export default function AdminDashboardPage() {
     if (user) {
       const fetchAssessments = async () => {
         setIsLoading(true);
+        setError(null); // Clear previous errors
         try {
-          // Force a token refresh to get latest custom claims
-          const idTokenResult = await user.getIdTokenResult(true); 
+          const idTokenResult = await user.getIdTokenResult(true);
           if (idTokenResult.claims.isAdmin) {
             const data = await getAllAssessments();
             setAssessments(data);
           } else {
             setError('You do not have permission to view this page.');
           }
-        } catch (e) {
-          console.error(e);
-          setError('Failed to fetch assessment data. You may not have the required permissions.');
+        } catch (e: any) {
+          // The error thrown from getAllAssessments will be more detailed
+          setError(e.message || 'Failed to fetch assessment data.');
         } finally {
           setIsLoading(false);
         }
@@ -66,8 +66,10 @@ export default function AdminDashboardPage() {
   }
 
   const handleSignOut = async () => {
-    await auth.signOut();
-    router.push('/admin/login');
+    if (auth) {
+      await auth.signOut();
+      router.push('/admin/login');
+    }
   };
 
   const getCategoryVariant = (category: string) => {
@@ -91,9 +93,14 @@ export default function AdminDashboardPage() {
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </div>
         ) : error ? (
-          <div className="text-center py-20">
-            <p className="text-destructive font-semibold">Error</p>
-            <p className="text-muted-foreground mt-2">{error}</p>
+          <div className="text-center py-20 border rounded-lg bg-card text-destructive p-4">
+            <p className="font-semibold text-lg">Access Denied</p>
+            <p className="text-muted-foreground mt-2 font-mono text-sm whitespace-pre-wrap">
+              {error}
+            </p>
+             <Button variant="outline" className="mt-6" onClick={() => window.location.reload()}>
+              Try Again
+            </Button>
           </div>
         ) : (
           <div className="border rounded-lg">

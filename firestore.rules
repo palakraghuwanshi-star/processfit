@@ -1,0 +1,99 @@
+/**
+ * Core Philosophy:
+ * This ruleset enforces a strict user-ownership model, often referred to as a
+ * "user data silo." All data is considered private and is only accessible by the
+ * user who created it. There is no concept of public or shared data in this model.
+ *
+ * Data Structure:
+ * The data is hierarchically organized to enforce the ownership model. All
+ * user-generated content, including assessments and their corresponding
+ * questionnaire responses, is nested under a user-specific path:
+ * /users/{userId}/... This structure makes security rules simple, efficient,
+ * and highly secure, as ownership can be determined directly from the document path.
+ *
+ * Key Security Decisions:
+ * - Strict Privacy: A user can only read and write their own data. Access to
+ *   another user's data is explicitly denied.
+ * - No Public Listing: It is impossible to list all assessments or users in the
+ *   database. Client-side queries must be scoped to the authenticated user's
+ *   data tree.
+ * - Path-Based Security: Ownership is determined by the {userId} wildcard in the
+ *   document path, which is the most performant way to enforce user-specific
+ *   access. This avoids costly `get()` calls to other documents for authorization.
+ * - Relational Integrity: On document creation, rules ensure that internal ID
+ *   fields (e.g., `assessmentId`) match the corresponding IDs in the document
+ *   path, preventing data from being misplaced. These IDs are immutable on update.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ------------------------------------------------------------------------
+    // Helper Functions
+    // ------------------------------------------------------------------------
+
+    /**
+     * Checks if a user is authenticated.
+     */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /**
+     * Checks if the currently authenticated user is the owner of the resource.
+     * Ownership is determined by matching the request's auth UID with the
+     * userId from the document path.
+     */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /**
+     * Checks for ownership on an existing document. Used for update and delete
+     * operations to prevent acting on non-existent data.
+     */
+    function isExistingOwner(userId) {
+      return isOwner(userId) && resource != null;
+    }
+
+    // ------------------------------------------------------------------------
+    // User Data Collections
+    // ------------------------------------------------------------------------
+
+    /**
+     * @description Controls access to a user's individual assessment documents.
+     * @path /users/{userId}/assessments/{assessmentId}
+     * @allow (create) An authenticated user creating an assessment under their own user ID path.
+     * @deny (get) User 'user456' trying to read an assessment from '/users/user123/assessments/abc'.
+     * @principle Restricts all access to the user's own data tree, enforcing a private data silo.
+     */
+    match /users/{userId}/assessments/{assessmentId} {
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId);
+      allow create: if isOwner(userId)
+                      && request.resource.data.id == assessmentId;
+      allow update: if isExistingOwner(userId)
+                      && request.resource.data.id == resource.data.id;
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Controls access to the responses for a specific assessment.
+     * @path /users/{userId}/assessments/{assessmentId}/questionnaireResponses/{questionnaireResponseId}
+     * @allow (create) User 'user123' creating a response for their own assessment at '/users/user123/assessments/abc/...'.
+     * @deny (update) User 'user123' trying to update a response but with a different `assessmentId` in the body, which would break the parent link.
+     * @principle Enforces inherited ownership from the parent path and validates relational integrity between a response and its parent assessment.
+     */
+    match /users/{userId}/assessments/{assessmentId}/questionnaireResponses/{questionnaireResponseId} {
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId);
+      allow create: if isOwner(userId)
+                      && request.resource.data.id == questionnaireResponseId
+                      && request.resource.data.assessmentId == assessmentId;
+      allow update: if isExistingOwner(userId)
+                      && request.resource.data.id == resource.data.id
+                      && request.resource.data.assessmentId == resource.data.assessmentId;
+      allow delete: if isExistingOwner(userId);
+    }
+  }
+}

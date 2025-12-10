@@ -1,0 +1,184 @@
+{
+  "entities": {
+    "Assessment": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Assessment",
+      "type": "object",
+      "description": "Represents a single assessment questionnaire and its overall results.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Assessment entity."
+        },
+        "processName": {
+          "type": "string",
+          "description": "The name of the process being assessed (e.g., 'Invoice Processing')."
+        },
+        "industry": {
+          "type": "string",
+          "description": "The industry of the organization being assessed (e.g., 'Manufacturing')."
+        },
+        "volumeScaleScore": {
+          "type": "number",
+          "description": "The calculated score for the Volume & Scale section."
+        },
+        "costEfficiencyScore": {
+          "type": "number",
+          "description": "The calculated score for the Cost & Efficiency section."
+        },
+        "riskComplianceScore": {
+          "type": "number",
+          "description": "The calculated score for the Risk & Compliance section."
+        },
+        "feasibilityScore": {
+          "type": "number",
+          "description": "The calculated score for the Feasibility section."
+        },
+        "strategicImpactScore": {
+          "type": "number",
+          "description": "The calculated score for the Strategic Impact section."
+        },
+        "businessImpactScore": {
+          "type": "number",
+          "description": "The calculated Business Impact score."
+        },
+        "totalScore": {
+          "type": "number",
+          "description": "The overall calculated total score for the assessment."
+        },
+        "category": {
+          "type": "string",
+          "description": "The categorization of the process (e.g., 'Quick Win', 'Strategic Long-Term')."
+        },
+        "recommendation": {
+          "type": "string",
+          "description": "Recommendation from the AI analysis (e.g., Quick Win/Strategic/Phase 2/Not Feasible)"
+        },
+        "confidence": {
+          "type": "number",
+          "description": "Confidence level (0-100%) from the AI analysis."
+        },
+        "topStrengths": {
+          "type": "array",
+          "description": "Top 3 strengths from the AI analysis.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "topConcerns": {
+          "type": "array",
+          "description": "Top 3 concerns from the AI analysis.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "timelineEstimate": {
+          "type": "string",
+          "description": "Timeline estimate from the AI analysis."
+        },
+        "nextSteps": {
+          "type": "string",
+          "description": "Suggested next steps from the AI analysis."
+        }
+      },
+      "required": [
+        "id",
+        "processName",
+        "industry",
+        "volumeScaleScore",
+        "costEfficiencyScore",
+        "riskComplianceScore",
+        "feasibilityScore",
+        "strategicImpactScore",
+        "businessImpactScore",
+        "totalScore",
+        "category"
+      ]
+    },
+    "QuestionnaireResponse": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "QuestionnaireResponse",
+      "type": "object",
+      "description": "Represents a user's answers to a specific question in the assessment.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the QuestionnaireResponse entity."
+        },
+        "assessmentId": {
+          "type": "string",
+          "description": "Reference to the Assessment this response belongs to. (Relationship: Assessment 1:N QuestionnaireResponse)"
+        },
+        "questionId": {
+          "type": "string",
+          "description": "The ID of the question being answered."
+        },
+        "answer": {
+          "type": "string",
+          "description": "The user's answer to the question.  Can be text, number, or selection."
+        }
+      },
+      "required": [
+        "id",
+        "assessmentId",
+        "questionId",
+        "answer"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}/assessments/{assessmentId}",
+        "definition": {
+          "entityName": "Assessment",
+          "schema": {
+            "$ref": "#/backend/entities/Assessment"
+          },
+          "description": "Stores assessment data. Owned by the user. Includes the assessment id in each document.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The ID of the user who owns the assessment."
+            },
+            {
+              "name": "assessmentId",
+              "description": "The ID of the assessment document."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/assessments/{assessmentId}/questionnaireResponses/{questionnaireResponseId}",
+        "definition": {
+          "entityName": "QuestionnaireResponse",
+          "schema": {
+            "$ref": "#/backend/entities/QuestionnaireResponse"
+          },
+          "description": "Stores individual questionnaire responses associated with an assessment. Owned by the user through the parent assessment. Includes the questionnaireResponse id in each document.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The ID of the user who owns the parent assessment."
+            },
+            {
+              "name": "assessmentId",
+              "description": "The ID of the parent assessment."
+            },
+            {
+              "name": "questionnaireResponseId",
+              "description": "The ID of the questionnaire response."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure is designed to optimize security, scalability, and debuggability for the ProcessFit Analyzer application, adhering to the core design principles and strategy mandates. It focuses on authorization independence, structural segregation, consistent access modeling, and data clarity.\n\n**Authorization Independence:**\n\nTo ensure authorization independence and eliminate `get()` calls in security rules, the structure denormalizes authorization context where necessary. Currently, all assessments are user-owned and questionnaires associated with the assessment. Therefore, the primary denormalization strategy involves storing the `userId` (owner) for each assessment in the `/assessments/{assessmentId}` document. QuestionnaireResponses inherit the `assessmentId`, allowing access control based on the parent Assessment's ownership without needing to perform additional reads.\n\n**Structural Segregation:**\nThe database structure is designed to ensure that collections contain documents with a homogeneous security posture.\n\n**Access Modeling:**\n\n*   **User-Owned Data:** Assessments and QuestionnaireResponses are structured under the `/users/{userId}` path to leverage path-based ownership. This makes ownership-based security rules simple and efficient.\n\n**QAPs (Rules are not Filters):**\n\nThe proposed structure supports secure `list` operations by ensuring that all documents within a collection share the same security requirements. Path-based ownership (`/users/{userId}/assessments/{assessmentId}`) makes it straightforward to list only the assessments belonging to a specific user."
+  }
+}

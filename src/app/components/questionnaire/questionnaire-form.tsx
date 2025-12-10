@@ -740,7 +740,7 @@ const Section6 = () => (
                       <FormControl>
                         <RadioGroupItem value={o} />
                       </FormControl>
-                      <FormLabel className="font-normal">{o}</FormLabel>_
+                      <FormLabel className="font-normal">{o}</FormLabel>
                     </FormItem>
                   ))}
                 </RadioGroup>
@@ -887,3 +887,5 @@ const Section7 = () => (
     </div>
   </div>
 );
+
+    

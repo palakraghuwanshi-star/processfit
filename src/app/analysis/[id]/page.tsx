@@ -10,7 +10,6 @@ import { ScoreSummary } from "@/app/components/analysis/score-summary";
 import { ScoreBreakdown } from "@/app/components/analysis/score-breakdown";
 import { PriorityMatrix } from "@/app/components/analysis/priority-matrix";
 import { KeyInsights } from "@/app/components/analysis/key-insights";
-import { AiAnalysis } from "@/app/components/analysis/ai-analysis";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
@@ -111,7 +110,6 @@ export default function AnalysisPage() {
             </div>
 
             <div className="lg:col-span-2 grid gap-6">
-                <AiAnalysis userId={user.uid} analysisId={analysisId} initialAiAnalysis={data.aiAnalysis} />
                 <ScoreBreakdown scores={data.scores} />
             </div>
 

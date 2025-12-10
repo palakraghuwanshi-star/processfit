@@ -130,7 +130,12 @@
     "providers": [
       "password",
       "anonymous"
-    ]
+    ],
+    "customClaims": {
+      "isAdmin": {
+        "type": "boolean"
+      }
+    }
   },
   "firestore": {
     "structure": [
@@ -179,6 +184,6 @@
         }
       }
     ],
-    "reasoning": "The Firestore structure is designed to optimize security, scalability, and debuggability for the ProcessFit Analyzer application, adhering to the core design principles and strategy mandates. It focuses on authorization independence, structural segregation, consistent access modeling, and data clarity.\n\n**Authorization Independence:**\n\nTo ensure authorization independence and eliminate `get()` calls in security rules, the structure denormalizes authorization context where necessary. Currently, all assessments are user-owned and questionnaires associated with the assessment. Therefore, the primary denormalization strategy involves storing the `userId` (owner) for each assessment in the `/assessments/{assessmentId}` document. QuestionnaireResponses inherit the `assessmentId`, allowing access control based on the parent Assessment's ownership without needing to perform additional reads.\n\n**Structural Segregation:**\nThe database structure is designed to ensure that collections contain documents with a homogeneous security posture.\n\n**Access Modeling:**\n\n*   **User-Owned Data:** Assessments and QuestionnaireResponses are structured under the `/users/{userId}` path to leverage path-based ownership. This makes ownership-based security rules simple and efficient.\n\n**QAPs (Rules are not Filters):**\n\nThe proposed structure supports secure `list` operations by ensuring that all documents within a collection share the same security requirements. Path-based ownership (`/users/{userId}/assessments/{assessmentId}`) makes it straightforward to list only the assessments belonging to a specific user."
+    "reasoning": "The Firestore structure is designed to optimize security, scalability, and debuggability for the ProcessFit Analyzer application, adhering to the core design principles and strategy mandates. It focuses on authorization independence, structural segregation, consistent access modeling, and data clarity.\n\n**Authorization Independence:**\n\nTo ensure authorization independence and eliminate `get()` calls in security rules, the structure denormalizes authorization context where necessary. Currently, all assessments are user-owned and questionnaires associated with the assessment. Therefore, the primary denormalization strategy involves storing the `userId` (owner) for each assessment in the `/assessments/{assessmentId}` document. QuestionnaireResponses inherit the `assessmentId`, allowing access control based on the parent Assessment's ownership without needing to perform additional reads.\n\n**Structural Segregation:**\nThe database structure is designed to ensure that collections contain documents with a homogeneous security posture.\n\n**Access Modeling:**\n\n*   **User-Owned Data:** Assessments and QuestionnaireResponses are structured under the `/users/{userId}` path to leverage path-based ownership. This makes ownership-based security rules simple and efficient.\n*   **Admin Access:** An 'isAdmin' custom claim will be used to grant read access to all assessments for admin users. This allows for a separate, more privileged access pattern without compromising the security of regular user data.\n\n**QAPs (Rules are not Filters):**\n\nThe proposed structure supports secure `list` operations by ensuring that all documents within a collection share the same security requirements. Path-based ownership (`/users/{userId}/assessments/{assessmentId}`) makes it straightforward to list only the assessments belonging to a specific user. For admins, a collection group query on 'assessments' combined with the 'isAdmin' claim will provide secure, cross-user data access."
   }
 }

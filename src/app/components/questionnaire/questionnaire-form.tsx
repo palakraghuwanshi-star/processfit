@@ -684,86 +684,20 @@ const Section5 = () => (
 const Section6 = () => (
   <div className="space-y-8">
     <h2 className="text-xl font-semibold text-foreground">Feasibility</h2>
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-      <FormField
-        name="documentationStatus"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Do you have documented procedures (SOPs) for this process?</FormLabel>
-            <FormControl>
-              <RadioGroup
-                onValueChange={field.onChange}
-                defaultValue={field.value}
-                className="space-y-2 pt-1"
-              >
-                {Options.sopStatusOptions.map(o => (
-                  <FormItem key={o} className="flex items-center space-x-3 space-y-0">
-                    <FormControl>
-                      <RadioGroupItem value={o} />
-                    </FormControl>
-                    <FormLabel className="font-normal">{o}</FormLabel>
-                  </FormItem>
-                ))}
-              </RadioGroup>
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-      <FormField
-        name="processStandardization"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>What percentage of transactions follow the exact same steps?</FormLabel>
-            <FormControl>
-              <Input
-                type="number"
-                placeholder="e.g., 85"
-                endIcon="%"
-                {...field}
-                value={field.value ?? ''}
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-      <FormField
-        name="exceptionHandling"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>
-              What percentage of transactions require special handling or don't follow the
-              standard process?
-            </FormLabel>
-            <FormControl>
-              <Input
-                type="number"
-                placeholder="e.g., 12"
-                endIcon="%"
-                {...field}
-                value={field.value ?? ''}
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-    </div>
-    <SystemsInput />
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+    <div className="space-y-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
         <FormField
-            name="systemAccess"
+            name="documentationStatus"
             render={({ field }) => (
             <FormItem>
-                <FormLabel>How are these systems accessed?</FormLabel>
+                <FormLabel>Do you have documented procedures (SOPs) for this process?</FormLabel>
                 <FormControl>
                 <RadioGroup
                     onValueChange={field.onChange}
                     defaultValue={field.value}
                     className="space-y-2 pt-1"
                 >
-                    {Options.systemAccessOptions.map(o => (
+                    {Options.sopStatusOptions.map(o => (
                     <FormItem key={o} className="flex items-center space-x-3 space-y-0">
                         <FormControl>
                         <RadioGroupItem value={o} />
@@ -777,6 +711,75 @@ const Section6 = () => (
             </FormItem>
             )}
         />
+        <FormField
+            name="processStandardization"
+            render={({ field }) => (
+            <FormItem>
+                <FormLabel>What percentage of transactions follow the exact same steps?</FormLabel>
+                <FormControl>
+                <Input
+                    type="number"
+                    placeholder="e.g., 85"
+                    endIcon="%"
+                    {...field}
+                    value={field.value ?? ''}
+                />
+                </FormControl>
+                <FormMessage />
+            </FormItem>
+            )}
+        />
+      </div>
+        
+      <FormField
+          name="exceptionHandling"
+          render={({ field }) => (
+          <FormItem>
+              <FormLabel>
+              What percentage of transactions require special handling or don&apos;t follow the
+              standard process?
+              </FormLabel>
+              <FormControl>
+              <Input
+                  type="number"
+                  placeholder="e.g., 12"
+                  endIcon="%"
+                  {...field}
+                  value={field.value ?? ''}
+              />
+              </FormControl>
+              <FormMessage />
+          </FormItem>
+          )}
+      />
+
+      <SystemsInput />
+
+      <FormField
+          name="systemAccess"
+          render={({ field }) => (
+          <FormItem>
+              <FormLabel>How are these systems accessed?</FormLabel>
+              <FormControl>
+              <RadioGroup
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                  className="space-y-2 pt-1"
+              >
+                  {Options.systemAccessOptions.map(o => (
+                  <FormItem key={o} className="flex items-center space-x-3 space-y-0">
+                      <FormControl>
+                      <RadioGroupItem value={o} />
+                      </FormControl>
+                      <FormLabel className="font-normal">{o}</FormLabel>
+                  </FormItem>
+                  ))}
+              </RadioGroup>
+              </FormControl>
+              <FormMessage />
+          </FormItem>
+          )}
+      />
     </div>
   </div>
 );

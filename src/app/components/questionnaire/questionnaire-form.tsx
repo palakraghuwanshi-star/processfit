@@ -685,7 +685,6 @@ const Section6 = () => (
   <div className="space-y-8">
     <h2 className="text-xl font-semibold text-foreground">Feasibility</h2>
     <div className="space-y-8">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
         <FormField
             name="documentationStatus"
             render={({ field }) => (
@@ -729,8 +728,6 @@ const Section6 = () => (
             </FormItem>
             )}
         />
-      </div>
-        
       <FormField
           name="exceptionHandling"
           render={({ field }) => (

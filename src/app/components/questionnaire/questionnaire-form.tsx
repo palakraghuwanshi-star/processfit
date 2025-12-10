@@ -214,7 +214,7 @@ export function QuestionnaireForm() {
   return (
     <FormProvider {...form}>
       <div className="mb-8 border-b">
-        <div className="flex justify-center space-x-8 overflow-x-auto pb-4">
+        <div className="flex justify-start space-x-8 overflow-x-auto pb-4">
           {formSections.map((section, index) => (
             <button
               key={section.title}
@@ -684,7 +684,7 @@ const Section5 = () => (
 const Section6 = () => (
   <div className="space-y-8">
     <h2 className="text-xl font-semibold text-foreground">Feasibility</h2>
-    <div className="space-y-8">
+    <div className="space-y-6">
       <FormField
         name="documentationStatus"
         render={({ field }) => (

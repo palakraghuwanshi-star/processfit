@@ -567,7 +567,7 @@ const Section7 = () => (
                 <FormItem>
                     <FormLabel>Is this manual process limiting your ability to scale or grow?</FormLabel>
                     <FormControl>
-                        <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="space-y-2 pt-1">
+                        <RadioGroup onValue-change={field.onChange} defaultValue={field.value} className="space-y-2 pt-1">
                             {Options.growthLimitOptions.map(o => (
                                 <FormItem key={o} className="flex items-center space-x-3 space-y-0">
                                     <FormControl><RadioGroupItem value={o} /></FormControl>
@@ -592,3 +592,5 @@ const Section7 = () => (
         </div>
     </div>
 );
+
+    

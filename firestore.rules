@@ -67,6 +67,25 @@ service cloud.firestore {
     }
 
     // ------------------------------------------------------------------------
+    // Collection Group Rules
+    // ------------------------------------------------------------------------
+
+    /**
+     * @description Grants read-only access to the 'assessments' collection group
+     *              for administrative purposes.
+     * @allow (get, list) An admin user can read any document from any user's
+     *                    'assessments' subcollection.
+     * @deny (get, list) Any non-admin user trying to perform a collection group query.
+     * @principle Enables a global, admin-only view of all assessments without
+     *            compromising the user data silo model. This rule is essential
+     *            for the admin dashboard functionality.
+     */
+    match /{path=**}/assessments/{assessmentId} {
+      allow get, list: if isAdmin();
+    }
+
+
+    // ------------------------------------------------------------------------
     // User Data Collections
     // ------------------------------------------------------------------------
 

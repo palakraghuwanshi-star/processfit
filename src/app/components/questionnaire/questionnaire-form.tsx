@@ -72,7 +72,7 @@ const formSections = [
   {
     title: 'Pain Points',
     icon: HeartPulse,
-    fields: ['currentChallenges', 'biggestPainPoint', 'impactOfDelays'],
+    fields: ['currentChallenges', 'impactOfDelays', 'biggestPainPoint'],
   },
   {
     title: 'Risk & Compliance',
@@ -83,8 +83,9 @@ const formSections = [
     title: 'Feasibility',
     icon: Construction,
     fields: [
-      'processStandardization',
       'documentationStatus',
+      'documentationPercentage',
+      'processStandardization',
       'exceptionHandling',
       'systems',
       'systemAccess',
@@ -138,8 +139,9 @@ export function QuestionnaireForm() {
       errorRate: '' as unknown as number,
       complianceRequirements: [],
       impactOfDelays: undefined,
-      processStandardization: '' as unknown as number,
       documentationStatus: undefined,
+      documentationPercentage: '' as unknown as number,
+      processStandardization: '' as unknown as number,
       exceptionHandling: '' as unknown as number,
       systems: [{ name: '', hasApi: 'Yes', isCloud: 'Yes' }],
       systemAccess: undefined,
@@ -706,7 +708,12 @@ const Section5 = () => (
   </div>
 );
 
-const Section6 = () => (
+const Section6 = () => {
+  const { watch } = useFormContext<FormValues>();
+  const documentationStatus = watch('documentationStatus');
+  const showDocumentationPercentage = documentationStatus === 'Partially documented';
+
+  return (
   <div className="space-y-8">
     <h2 className="text-xl font-semibold text-foreground">Feasibility</h2>
     <div className="space-y-6">
@@ -735,6 +742,37 @@ const Section6 = () => (
           </FormItem>
         )}
       />
+        <AnimatePresence>
+          {showDocumentationPercentage && (
+            <motion.div
+              initial={{ opacity: 0, height: 0, marginTop: 0 }}
+              animate={{ opacity: 1, height: 'auto', marginTop: '1.5rem' }}
+              exit={{ opacity: 0, height: 0, marginTop: 0 }}
+              transition={{ duration: 0.3 }}
+              className="max-w-lg"
+            >
+              <FormField
+                name="documentationPercentage"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>What percentage of the process is documented?</FormLabel>
+                    <FormControl>
+                       <Input
+                        type="number"
+                        placeholder="e.g., 50"
+                        endIcon="%"
+                        {...field}
+                        value={field.value ?? ''}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
       <FormField
         name="processStandardization"
         render={({ field }) => (
@@ -804,7 +842,8 @@ const Section6 = () => (
       />
     </div>
   </div>
-);
+  );
+};
 
 const Section7 = () => (
   <div>

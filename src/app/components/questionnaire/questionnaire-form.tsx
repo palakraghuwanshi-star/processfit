@@ -104,16 +104,16 @@ export function QuestionnaireForm() {
       yourName: "",
       processName: "",
       processDescription: "",
-      monthlyVolume: undefined,
-      teamSize: undefined,
-      timePercentage: undefined,
-      costPerTransaction: undefined,
+      monthlyVolume: '',
+      teamSize: '',
+      timePercentage: '',
+      costPerTransaction: '',
       currentChallenges: [],
       biggestPainPoint: "",
-      errorRate: undefined,
+      errorRate: '',
       complianceRequirements: [],
-      processStandardization: undefined,
-      exceptionHandling: undefined,
+      processStandardization: '',
+      exceptionHandling: '',
       systems: [{ name: "", hasApi: "Yes", isCloud: "Yes" }],
     },
   });
@@ -574,3 +574,5 @@ const Section7 = () => (
         </div>
     </div>
 );
+
+    

@@ -85,6 +85,7 @@ const formSections = [
     fields: [
       'documentationStatus',
       'documentationPercentage',
+      'reliesOnTribalKnowledge',
       'processStandardization',
       'exceptionHandling',
       'systems',
@@ -141,6 +142,7 @@ export function QuestionnaireForm() {
       impactOfDelays: undefined,
       documentationStatus: undefined,
       documentationPercentage: '' as unknown as number,
+      reliesOnTribalKnowledge: undefined,
       processStandardization: '' as unknown as number,
       exceptionHandling: '' as unknown as number,
       systems: [{ name: '', hasApi: 'Yes', isCloud: 'Yes' }],
@@ -246,8 +248,8 @@ export function QuestionnaireForm() {
             {currentStep === 0 && <Section1 />}
             {currentStep === 1 && <Section2 />}
             {currentStep === 2 && <Section3 />}
-            {currentStep === 3 && <Section4 />}
             {currentStep === 4 && <Section5 />}
+            {currentStep === 3 && <Section4 />}
             {currentStep === 5 && <Section6 />}
             {currentStep === 6 && <Section7 />}
           </motion.div>
@@ -712,136 +714,180 @@ const Section6 = () => {
   const { watch } = useFormContext<FormValues>();
   const documentationStatus = watch('documentationStatus');
   const showDocumentationPercentage = documentationStatus === 'Partially documented';
+  const showTribalKnowledgeQuestion = documentationStatus === 'No documentation exists';
 
   return (
-  <div className="space-y-8">
-    <h2 className="text-xl font-semibold text-foreground">Feasibility</h2>
-    <div className="space-y-6">
-      <FormField
-        name="documentationStatus"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Do you have documented procedures (SOPs) for this process?</FormLabel>
-            <FormControl>
-              <RadioGroup
-                onValueChange={field.onChange}
-                defaultValue={field.value}
-                className="space-y-2 pt-1"
-              >
-                {Options.sopStatusOptions.map(o => (
-                  <FormItem key={o} className="flex items-center space-x-3 space-y-0">
-                    <FormControl>
-                      <RadioGroupItem value={o} />
-                    </FormControl>
-                    <FormLabel className="font-normal">{o}</FormLabel>
-                  </FormItem>
-                ))}
-              </RadioGroup>
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-        <AnimatePresence>
-          {showDocumentationPercentage && (
-            <motion.div
-              initial={{ opacity: 0, height: 0, marginTop: 0 }}
-              animate={{ opacity: 1, height: 'auto', marginTop: '1.5rem' }}
-              exit={{ opacity: 0, height: 0, marginTop: 0 }}
-              transition={{ duration: 0.3 }}
-              className="max-w-lg"
-            >
-              <FormField
-                name="documentationPercentage"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>What percentage of the process is documented?</FormLabel>
-                    <FormControl>
-                       <Input
-                        type="number"
-                        placeholder="e.g., 50"
-                        endIcon="%"
-                        {...field}
-                        value={field.value ?? ''}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </motion.div>
+    <div className="space-y-8">
+      <h2 className="text-xl font-semibold text-foreground">Feasibility</h2>
+      <div className="space-y-6">
+        <div className="space-y-6">
+            <FormField
+              name="documentationStatus"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Do you have documented procedures (SOPs) for this process?</FormLabel>
+                  <FormControl>
+                    <RadioGroup
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      className="space-y-2 pt-1"
+                    >
+                      {Options.sopStatusOptions.map(o => (
+                        <FormItem key={o} className="flex items-center space-x-3 space-y-0">
+                          <FormControl>
+                            <RadioGroupItem value={o} />
+                          </FormControl>
+                          <FormLabel className="font-normal">{o}</FormLabel>
+                        </FormItem>
+                      ))}
+                    </RadioGroup>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <AnimatePresence>
+              {showDocumentationPercentage && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0, marginTop: 0 }}
+                  animate={{ opacity: 1, height: 'auto', marginTop: '1.5rem' }}
+                  exit={{ opacity: 0, height: 0, marginTop: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="max-w-lg"
+                >
+                  <FormField
+                    name="documentationPercentage"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>What percentage of the process is documented?</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            placeholder="e.g., 50"
+                            endIcon="%"
+                            {...field}
+                            value={field.value ?? ''}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
+            <AnimatePresence>
+              {showTribalKnowledgeQuestion && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0, marginTop: 0 }}
+                  animate={{ opacity: 1, height: 'auto', marginTop: '1.5rem' }}
+                  exit={{ opacity: 0, height: 0, marginTop: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="max-w-lg"
+                >
+                  <FormField
+                    name="reliesOnTribalKnowledge"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Does the process rely heavily on individual judgment or 'tribal knowledge'?</FormLabel>
+                         <FormControl>
+                            <RadioGroup
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                                className="flex items-center space-x-4 pt-1"
+                            >
+                                <FormItem className="flex items-center space-x-2 space-y-0">
+                                    <FormControl>
+                                        <RadioGroupItem value="Yes" />
+                                    </FormControl>
+                                    <FormLabel className="font-normal">Yes</FormLabel>
+                                </FormItem>
+                                <FormItem className="flex items-center space-x-2 space-y-0">
+                                    <FormControl>
+                                        <RadioGroupItem value="No" />
+                                    </FormControl>
+                                    <FormLabel className="font-normal">No</FormLabel>
+                                </FormItem>
+                            </RadioGroup>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
+        </div>
+
+        <FormField
+          name="processStandardization"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>What percentage of transactions follow the exact same steps?</FormLabel>
+              <FormControl>
+                <Input
+                  type="number"
+                  placeholder="e.g., 85"
+                  endIcon="%"
+                  {...field}
+                  value={field.value ?? ''}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
           )}
-        </AnimatePresence>
+        />
+        <FormField
+          name="exceptionHandling"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>
+                What percentage of transactions require special handling or don&apos;t follow the
+                standard process?
+              </FormLabel>
+              <FormControl>
+                <Input
+                  type="number"
+                  placeholder="e.g., 12"
+                  endIcon="%"
+                  {...field}
+                  value={field.value ?? ''}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-      <FormField
-        name="processStandardization"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>What percentage of transactions follow the exact same steps?</FormLabel>
-            <FormControl>
-              <Input
-                type="number"
-                placeholder="e.g., 85"
-                endIcon="%"
-                {...field}
-                value={field.value ?? ''}
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-      <FormField
-        name="exceptionHandling"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>
-              What percentage of transactions require special handling or don&apos;t follow the
-              standard process?
-            </FormLabel>
-            <FormControl>
-              <Input
-                type="number"
-                placeholder="e.g., 12"
-                endIcon="%"
-                {...field}
-                value={field.value ?? ''}
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
+        <SystemsInput />
 
-      <SystemsInput />
-
-      <FormField
-        name="systemAccess"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>How are these systems accessed?</FormLabel>
-            <FormControl>
-              <RadioGroup
-                onValueChange={field.onChange}
-                defaultValue={field.value}
-                className="space-y-2 pt-1"
-              >
-                {Options.systemAccessOptions.map(o => (
-                  <FormItem key={o} className="flex items-center space-x-3 space-y-0">
-                    <FormControl>
-                      <RadioGroupItem value={o} />
-                    </FormControl>
-                    <FormLabel className="font-normal">{o}</FormLabel>
-                  </FormItem>
-                ))}
-              </RadioGroup>
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
+        <FormField
+          name="systemAccess"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>How are these systems accessed?</FormLabel>
+              <FormControl>
+                <RadioGroup
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                  className="space-y-2 pt-1"
+                >
+                  {Options.systemAccessOptions.map(o => (
+                    <FormItem key={o} className="flex items-center space-x-3 space-y-0">
+                      <FormControl>
+                        <RadioGroupItem value={o} />
+                      </FormControl>
+                      <FormLabel className="font-normal">{o}</FormLabel>
+                    </FormItem>
+                  ))}
+                </RadioGroup>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </div>
     </div>
-  </div>
   );
 };
 

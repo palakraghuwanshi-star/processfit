@@ -2,7 +2,7 @@
 'use client';
 
 import * as React from 'react';
-import { useForm, FormProvider } from 'react-hook-form';
+import { useForm, FormProvider, useFormContext } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
@@ -534,82 +534,108 @@ const Section3 = () => (
   </div>
 );
 
-const Section4 = () => (
-  <div>
-    <FormSectionHeader title="Pain Points" />
-    <div className="space-y-6 max-w-lg">
-      <FormField
-        name="currentChallenges"
-        render={() => (
-          <FormItem>
-            <FormLabel>What are the main challenges with this process? (Select all that apply)</FormLabel>
-            <div className="space-y-2 pt-2">
-              {Options.challengesOptions.map(item => (
-                <FormField
-                  key={item}
-                  name="currentChallenges"
-                  render={({ field }) => (
-                    <FormItem key={item} className="flex flex-row items-start space-x-3 space-y-0">
-                      <FormControl>
-                        <Checkbox
-                          checked={field.value?.includes(item)}
-                          onCheckedChange={checked => {
-                            return checked
-                              ? field.onChange([...(field.value || []), item])
-                              : field.onChange(field.value?.filter(value => value !== item));
-                          }}
-                        />
-                      </FormControl>
-                      <FormLabel className="font-normal">{item}</FormLabel>
-                    </FormItem>
-                  )}
-                />
-              ))}
-            </div>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-      <FormField
-        name="biggestPainPoint"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>What is the single biggest problem or frustration with this process?</FormLabel>
-            <FormControl>
-              <Textarea placeholder="Describe your top pain point..." {...field} rows={4} />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-      <FormField
-        name="impactOfDelays"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>What happens when this process is delayed?</FormLabel>
-            <FormControl>
-              <RadioGroup
-                onValueChange={field.onChange}
-                defaultValue={field.value}
-                className="space-y-2 pt-1"
-              >
-                {Options.delayImpactOptions.map(o => (
-                  <FormItem key={o} className="flex items-center space-x-3 space-y-0">
-                    <FormControl>
-                      <RadioGroupItem value={o} />
-                    </FormControl>
-                    <FormLabel className="font-normal">{o}</FormLabel>
-                  </FormItem>
+const Section4 = () => {
+  const { watch } = useFormContext<FormValues>();
+  const currentChallenges = watch('currentChallenges') || [];
+  const showImpactOfDelays = currentChallenges.includes('Takes too long to complete');
+
+  return (
+    <div>
+      <FormSectionHeader title="Pain Points" />
+      <div className="space-y-6 max-w-lg">
+        <FormField
+          name="currentChallenges"
+          render={() => (
+            <FormItem>
+              <FormLabel>
+                What are the main challenges with this process? (Select all that apply)
+              </FormLabel>
+              <div className="space-y-2 pt-2">
+                {Options.challengesOptions.map(item => (
+                  <FormField
+                    key={item}
+                    name="currentChallenges"
+                    render={({ field }) => (
+                      <FormItem
+                        key={item}
+                        className="flex flex-row items-start space-x-3 space-y-0"
+                      >
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value?.includes(item)}
+                            onCheckedChange={checked => {
+                              return checked
+                                ? field.onChange([...(field.value || []), item])
+                                : field.onChange(field.value?.filter(value => value !== item));
+                            }}
+                          />
+                        </FormControl>
+                        <FormLabel className="font-normal">{item}</FormLabel>
+                      </FormItem>
+                    )}
+                  />
                 ))}
-              </RadioGroup>
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
+              </div>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <AnimatePresence>
+          {showImpactOfDelays && (
+            <motion.div
+              initial={{ opacity: 0, height: 0, marginTop: 0 }}
+              animate={{ opacity: 1, height: 'auto', marginTop: '1.5rem' }}
+              exit={{ opacity: 0, height: 0, marginTop: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <FormField
+                name="impactOfDelays"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>What happens when this process is delayed?</FormLabel>
+                    <FormControl>
+                      <RadioGroup
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        className="space-y-2 pt-1"
+                      >
+                        {Options.delayImpactOptions.map(o => (
+                          <FormItem key={o} className="flex items-center space-x-3 space-y-0">
+                            <FormControl>
+                              <RadioGroupItem value={o} />
+                            </FormControl>
+                            <FormLabel className="font-normal">{o}</FormLabel>
+                          </FormItem>
+                        ))}
+                      </RadioGroup>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <FormField
+          name="biggestPainPoint"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>
+                What is the single biggest problem or frustration with this process?
+              </FormLabel>
+              <FormControl>
+                <Textarea placeholder="Describe your top pain point..." {...field} rows={4} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const Section5 = () => (
   <div>
@@ -684,7 +710,7 @@ const Section6 = () => (
   <div className="space-y-8">
     <h2 className="text-xl font-semibold text-foreground">Feasibility</h2>
     <div className="space-y-6">
-       <FormField
+      <FormField
         name="documentationStatus"
         render={({ field }) => (
           <FormItem>
@@ -709,7 +735,7 @@ const Section6 = () => (
           </FormItem>
         )}
       />
-       <FormField
+      <FormField
         name="processStandardization"
         render={({ field }) => (
           <FormItem>

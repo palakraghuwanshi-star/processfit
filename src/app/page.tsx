@@ -23,7 +23,9 @@ export default function Home() {
         </Button>
       </header>
       <main className="w-full max-w-4xl">
-         <QuestionnaireForm />
+         <div className="p-8 border rounded-lg bg-card">
+            <QuestionnaireForm />
+         </div>
       </main>
     </div>
   );

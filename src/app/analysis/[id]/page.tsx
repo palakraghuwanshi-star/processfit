@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from "react";
 import { notFound, useParams } from "next/navigation";
-import { useUser, useFirestore } from "@/firebase";
+import { useUser } from "@/firebase";
 import { getAssessment } from "@/app/lib/data-store";
 import type { AnalysisResult } from "@/app/lib/data-store";
 import { ScoreSummary } from "@/app/components/analysis/score-summary";
@@ -26,9 +26,14 @@ export default function AnalysisPage() {
       return;
     }
     if (!user) {
-      setError("You must be logged in to view this page.");
-      setIsLoading(false);
-      return;
+      // Allow a brief moment for anon sign-in to complete
+      const timer = setTimeout(() => {
+        if (!user) {
+          setError("You must be logged in to view this page.");
+          setIsLoading(false);
+        }
+      }, 1500);
+      return () => clearTimeout(timer);
     }
     if (!analysisId) {
       notFound();

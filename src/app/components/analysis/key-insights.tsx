@@ -15,7 +15,7 @@ interface KeyInsightsProps {
 
 export function KeyInsights({ flags, formData }: KeyInsightsProps) {
   return (
-    <Card className="shadow-lg">
+    <Card>
       <CardHeader>
         <CardTitle className="font-headline text-2xl">Key Insights</CardTitle>
         <CardDescription>

@@ -4,7 +4,6 @@ import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -14,12 +13,12 @@ const categoryPriority: Record<string, { priority: string; variant: "default" | 
     "QUICK WIN ⭐": { priority: "Highest", variant: "default"},
     "STRATEGIC LONG-TERM": { priority: "High", variant: "secondary"},
     "INCREMENTAL GAINS": { priority: "Medium", variant: "outline" },
-    "AVOID/REVISIT": { priority: "Low", variant: "destructive"},
+    "AVOID/REVISIT": { priority: "destructive", variant: "destructive"},
 }
 
 const categoryColors: Record<string, string> = {
     "green": "bg-green-500",
-    "yellow": "bg-yellow-500",
+    "blue": "bg-blue-500",
     "orange": "bg-orange-500",
     "red": "bg-red-500",
 }
@@ -34,7 +33,7 @@ export function ScoreSummary({ scores, totalScore }: ScoreSummaryProps) {
   const priorityInfo = categoryPriority[scores.category] || { priority: 'N/A', variant: 'secondary' };
 
   return (
-    <Card className="shadow-lg">
+    <Card>
       <CardHeader>
         <CardTitle className="font-headline text-2xl">Score Summary</CardTitle>
       </CardHeader>

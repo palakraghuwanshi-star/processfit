@@ -16,7 +16,7 @@ interface PriorityMatrixProps {
 
 const quadrantConfig = {
     "QUICK WINS ⭐": "bg-green-500/10 border-green-500/50 text-green-700 dark:text-green-400",
-    "STRATEGIC LONG-TERM": "bg-yellow-500/10 border-yellow-500/50 text-yellow-700 dark:text-yellow-400",
+    "STRATEGIC LONG-TERM": "bg-blue-500/10 border-blue-500/50 text-blue-700 dark:text-blue-400",
     "INCREMENTAL GAINS": "bg-orange-500/10 border-orange-500/50 text-orange-700 dark:text-orange-400",
     "AVOID/REVISIT": "bg-red-500/10 border-red-500/50 text-red-700 dark:text-red-400",
 }
@@ -29,7 +29,7 @@ export function PriorityMatrix({ businessImpact, feasibility }: PriorityMatrixPr
   const xPos = (feasibility / maxFeasibility) * 100;
 
   return (
-    <Card className="shadow-lg">
+    <Card>
       <CardHeader>
         <CardTitle className="font-headline text-2xl">Priority Matrix</CardTitle>
         <CardDescription>

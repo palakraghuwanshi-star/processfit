@@ -32,7 +32,7 @@ export function ScoreBreakdown({ scores }: ScoreBreakdownProps) {
   ];
 
   return (
-    <Card className="shadow-lg">
+    <Card>
       <CardHeader>
         <CardTitle className="font-headline text-2xl">Score Breakdown</CardTitle>
         <CardDescription>

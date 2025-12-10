@@ -36,8 +36,8 @@ export default function AdminDashboardPage() {
       const fetchAssessments = async () => {
         setIsLoading(true);
         try {
-          // Check for admin custom claim
-          const idTokenResult = await user.getIdTokenResult();
+          // Force a token refresh to get latest custom claims
+          const idTokenResult = await user.getIdTokenResult(true); 
           if (idTokenResult.claims.isAdmin) {
             const data = await getAllAssessments();
             setAssessments(data);

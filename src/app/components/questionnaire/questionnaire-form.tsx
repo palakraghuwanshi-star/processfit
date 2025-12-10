@@ -100,7 +100,7 @@ const formSections = [
 type FieldName = (typeof formSections)[number]['fields'][number];
 
 function FormSectionHeader({ title }: { title: string }) {
-  return <h2 className="text-xl font-semibold text-foreground mb-6">{title}</h2>;
+  return <h2 class="text-xl font-semibold text-foreground mb-6">{title}</h2>;
 }
 
 export function QuestionnaireForm() {
@@ -887,5 +887,7 @@ const Section7 = () => (
     </div>
   </div>
 );
+
+    
 
     

@@ -1,28 +1,89 @@
-import { notFound, redirect } from "next/navigation";
-import { getData } from "@/app/lib/data-store";
+
+'use client';
+
+import { useEffect, useState } from "react";
+import { notFound, useParams } from "next/navigation";
+import { useUser, useFirestore } from "@/firebase";
+import { getAssessment } from "@/app/lib/data-store";
+import type { AnalysisResult } from "@/app/lib/data-store";
 import { ScoreSummary } from "@/app/components/analysis/score-summary";
 import { ScoreBreakdown } from "@/app/components/analysis/score-breakdown";
 import { PriorityMatrix } from "@/app/components/analysis/priority-matrix";
 import { KeyInsights } from "@/app/components/analysis/key-insights";
 import { AiAnalysis } from "@/app/components/analysis/ai-analysis";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 
+export default function AnalysisPage() {
+  const { id: analysisId } = useParams() as { id: string };
+  const { user, isUserLoading } = useUser();
+  const [data, setData] = useState<AnalysisResult | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-export default async function AnalysisPage({ params }: { params: { id: string } }) {
-  const data = await getData(params.id);
+  useEffect(() => {
+    if (isUserLoading) {
+      return;
+    }
+    if (!user) {
+      setError("You must be logged in to view this page.");
+      setIsLoading(false);
+      return;
+    }
+    if (!analysisId) {
+      notFound();
+      return;
+    }
 
+    const fetchData = async () => {
+      try {
+        const assessmentData = await getAssessment(user.uid, analysisId);
+        if (assessmentData) {
+          setData(assessmentData);
+        } else {
+          setError("Analysis not found.");
+        }
+      } catch (err) {
+        console.error(err);
+        setError("Failed to load analysis data.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+
+  }, [user, isUserLoading, analysisId]);
+
+  if (isLoading || isUserLoading) {
+    return (
+        <div className="flex min-h-screen w-full items-center justify-center bg-background">
+            <Loader2 className="h-12 w-12 animate-spin text-primary" />
+        </div>
+    );
+  }
+
+  if (error) {
+     return (
+      <div className="min-h-screen w-full bg-background flex flex-col items-center justify-center py-8 sm:py-12 px-4">
+          <div className="text-center">
+              <h1 className="text-2xl font-bold text-destructive">{error}</h1>
+               <Button asChild variant="outline" className="mt-4">
+                  <Link href="/">
+                      <ArrowLeft className="mr-2 h-4 w-4" />
+                      Go Back
+                  </Link>
+              </Button>
+          </div>
+      </div>
+    );
+  }
+  
   if (!data) {
     return notFound();
   }
+
 
   return (
     <div className="min-h-screen w-full bg-background flex flex-col items-center justify-start py-8 sm:py-12 px-4">
@@ -50,7 +111,7 @@ export default async function AnalysisPage({ params }: { params: { id: string } 
             </div>
 
             <div className="lg:col-span-2 grid gap-6">
-                <AiAnalysis analysisId={params.id} initialAiAnalysis={data.aiAnalysis} />
+                <AiAnalysis userId={user.uid} analysisId={analysisId} initialAiAnalysis={data.aiAnalysis} />
                 <ScoreBreakdown scores={data.scores} />
             </div>
 

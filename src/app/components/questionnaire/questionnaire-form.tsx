@@ -17,9 +17,15 @@ import {
   ArrowRight,
   Info,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { randomUUID } from "crypto";
+
+import { useAuth, useUser } from "@/firebase";
+import { initiateAnonymousSignIn } from "@/firebase/non-blocking-login";
+import { saveAssessment } from "@/app/lib/data-store";
 
 import { formSchema, type FormValues } from "@/app/lib/schema";
-import { submitQuestionnaire } from "@/app/actions";
+import { calculateScores } from "@/app/lib/scoring";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
@@ -95,8 +101,19 @@ function FormSectionHeader({ title }: { title: string }) {
 
 export function QuestionnaireForm() {
   const [currentStep, setCurrentStep] = React.useState(0);
-  const [isPending, startTransition] = React.useTransition();
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
   const { toast } = useToast();
+  const router = useRouter();
+
+  const auth = useAuth();
+  const { user, isUserLoading } = useUser();
+
+  React.useEffect(() => {
+    if (!isUserLoading && !user) {
+      initiateAnonymousSignIn(auth);
+    }
+  }, [user, isUserLoading, auth]);
+
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -147,31 +164,53 @@ export function QuestionnaireForm() {
     setCurrentStep((prev) => prev - 1);
   };
 
-  const onSubmit = (data: FormValues) => {
-    startTransition(async () => {
-        try {
-            await submitQuestionnaire(data);
-        } catch (error) {
-            console.error(error);
-            toast({
-                variant: "destructive",
-                title: "Submission Error",
-                description: "There was a problem submitting your questionnaire.",
-            });
-        }
-    });
+  const onSubmit = async (data: FormValues) => {
+    if (!user) {
+        toast({
+            variant: "destructive",
+            title: "Authentication Error",
+            description: "You must be signed in to submit the form. Please wait a moment and try again.",
+        });
+        return;
+    }
+
+    setIsSubmitting(true);
+    try {
+        const id = randomUUID();
+        const { scores, flags } = calculateScores(data);
+
+        await saveAssessment(user.uid, id, {
+            submittedAt: new Date(),
+            formData: data,
+            scores,
+            flags,
+        });
+
+        router.push(`/analysis/${id}`);
+
+    } catch (error) {
+        console.error(error);
+        toast({
+            variant: "destructive",
+            title: "Submission Error",
+            description: "There was a problem submitting your questionnaire.",
+        });
+        setIsSubmitting(false);
+    }
   };
+  
+  const isPending = isSubmitting || isUserLoading;
 
   return (
     <FormProvider {...form}>
         <div className="mb-8 border-b">
-            <div className="flex justify-center space-x-8">
+            <div className="flex justify-center space-x-8 overflow-x-auto pb-4">
                 {formSections.map((section, index) => (
                     <button
                         key={section.title}
                         onClick={() => setCurrentStep(index)}
                         className={cn(
-                            "pb-3 text-sm font-medium text-muted-foreground transition-colors",
+                            "pb-3 text-sm font-medium text-muted-foreground transition-colors whitespace-nowrap",
                             currentStep === index ? "text-primary border-b-2 border-primary" : "hover:text-foreground"
                         )}
                         disabled={isPending}
@@ -298,7 +337,7 @@ const Section2 = () => (
             <FormField name="monthlyVolume" render={({ field }) => (
                 <FormItem>
                     <FormLabel>How many transactions does this process handle per month?</FormLabel>
-                    <FormControl><Input type="number" placeholder="e.g., 5000" {...field} /></FormControl>
+                    <FormControl><Input type="number" placeholder="e.g., 5000" {...field} value={field.value ?? ''} /></FormControl>
                     <FormMessage />
                 </FormItem>
             )} />
@@ -332,14 +371,14 @@ const Section3 = () => (
                     <FormField name="teamSize" render={({ field }) => (
                         <FormItem>
                              <FormLabel className="font-normal text-muted-foreground">Number of people (monthly)</FormLabel>
-                            <FormControl><Input type="number" placeholder="e.g., 4" {...field} /></FormControl>
+                            <FormControl><Input type="number" placeholder="e.g., 4" {...field} value={field.value ?? ''} /></FormControl>
                             <FormMessage />
                         </FormItem>
                     )} />
                     <FormField name="timePercentage" render={({ field }) => (
                         <FormItem>
                             <FormLabel className="font-normal text-muted-foreground">Average % of their monthly time spent on this process</FormLabel>
-                            <FormControl><Input type="number" placeholder="e.g., 50" endIcon="%" {...field} /></FormControl>
+                            <FormControl><Input type="number" placeholder="e.g., 50" endIcon="%" {...field} value={field.value ?? ''} /></FormControl>
                             <FormMessage />
                         </FormItem>
                     )} />
@@ -361,7 +400,7 @@ const Section3 = () => (
                 <FormField name="costPerTransaction" render={({ field }) => (
                     <FormItem>
                         <FormLabel>What is the estimated cost to process a single transaction?</FormLabel>
-                        <FormControl><Input type="number" placeholder="e.g., 25" startIcon="$" {...field} /></FormControl>
+                        <FormControl><Input type="number" placeholder="e.g., 25" startIcon="$" {...field} value={field.value ?? ''} /></FormControl>
                          <FormDescription className="flex items-center gap-1.5"><Info className="h-3 w-3"/>Include labor time and overhead for one transaction. If unsure, estimate: (Total monthly process cost) ÷ (Monthly transaction volume)</FormDescription>
                         <FormMessage />
                     </FormItem>
@@ -418,7 +457,7 @@ const Section5 = () => (
             <FormField name="errorRate" render={({ field }) => (
                 <FormItem>
                     <FormLabel>Approximately what percentage of transactions require rework due to errors?</FormLabel>
-                    <FormControl><Input type="number" placeholder="e.g., 15" endIcon="%" {...field} /></FormControl>
+                    <FormControl><Input type="number" placeholder="e.g., 15" endIcon="%" {...field} value={field.value ?? ''} /></FormControl>
                     <FormMessage />
                 </FormItem>
             )} />
@@ -478,14 +517,14 @@ const Section6 = () => (
                 <FormField name="processStandardization" render={({ field }) => (
                     <FormItem>
                         <FormLabel>What percentage of transactions follow the exact same steps?</FormLabel>
-                        <FormControl><Input type="number" placeholder="e.g., 85" endIcon="%" {...field} /></FormControl>
+                        <FormControl><Input type="number" placeholder="e.g., 85" endIcon="%" {...field} value={field.value ?? ''} /></FormControl>
                         <FormMessage />
                     </FormItem>
                 )} />
                 <FormField name="exceptionHandling" render={({ field }) => (
                     <FormItem>
                         <FormLabel>What percentage of transactions require special handling or don't follow the standard process?</FormLabel>
-                        <FormControl><Input type="number" placeholder="e.g., 12" endIcon="%" {...field} /></FormControl>
+                        <FormControl><Input type="number" placeholder="e.g., 12" endIcon="%" {...field} value={field.value ?? ''} /></FormControl>
                         <FormMessage />
                     </FormItem>
                 )} />
@@ -592,5 +631,3 @@ const Section7 = () => (
         </div>
     </div>
 );
-
-    

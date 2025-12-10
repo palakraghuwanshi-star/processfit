@@ -1,7 +1,10 @@
+
+'use client';
+
 import type { FormValues } from '@/app/lib/schema';
 import type { AnalyzeProcessOutput } from '@/ai/flows/analyze-process-with-ai';
-import fs from 'fs/promises';
-import path from 'path';
+import { getFirestore, doc, setDoc, getDoc, updateDoc, serverTimestamp, Timestamp } from 'firebase/firestore';
+import { initializeFirebase } from '@/firebase';
 
 export type AnalysisScores = {
     volumeScale: number;
@@ -17,61 +20,46 @@ export type AnalysisScores = {
 
 export type AnalysisResult = {
     id: string;
-    submittedAt: Date;
+    submittedAt: Date | Timestamp;
     formData: FormValues;
     scores: AnalysisScores;
     flags: string[];
     aiAnalysis?: AnalyzeProcessOutput;
 };
 
-const dataDir = path.join(process.cwd(), '.data');
+const getDb = () => {
+    const { firestore } = initializeFirebase();
+    return firestore;
+}
 
-const ensureDir = async () => {
-    try {
-        await fs.access(dataDir);
-    } catch {
-        await fs.mkdir(dataDir, { recursive: true });
-    }
+export const saveAssessment = async (userId: string, id: string, data: Omit<AnalysisResult, 'id'>) => {
+    const db = getDb();
+    const docRef = doc(db, 'users', userId, 'assessments', id);
+    await setDoc(docRef, {
+        ...data,
+        id, // ensure id is part of the document data
+        submittedAt: serverTimestamp() // Use server-side timestamp
+    });
 };
 
-const getFilePath = (id: string) => path.join(dataDir, `${id}.json`);
+export const getAssessment = async (userId: string, id: string): Promise<AnalysisResult | undefined> => {
+    const db = getDb();
+    const docRef = doc(db, 'users', userId, 'assessments', id);
+    const docSnap = await getDoc(docRef);
 
-export const saveData = async (id: string, data: AnalysisResult) => {
-    await ensureDir();
-    const filePath = getFilePath(id);
-    await fs.writeFile(filePath, JSON.stringify(data, null, 2));
-};
-
-export const getData = async (id: string): Promise<AnalysisResult | undefined> => {
-    await ensureDir();
-    const filePath = getFilePath(id);
-    try {
-        const fileContent = await fs.readFile(filePath, 'utf-8');
-        // Manually parse date strings back to Date objects
-        const parsedData = JSON.parse(fileContent, (key, value) => {
-            if (key === 'submittedAt' && typeof value === 'string') {
-                return new Date(value);
-            }
-            return value;
-        });
-        return parsedData as AnalysisResult;
-    } catch (error) {
-        if (isErrnoException(error) && error.code === 'ENOENT') {
-            return undefined;
-        }
-        console.error(`Failed to read data for id: ${id}`, error);
+    if (docSnap.exists()) {
+        const data = docSnap.data();
+        const submittedAt = data.submittedAt instanceof Timestamp ? data.submittedAt.toDate() : new Date();
+        return { ...data, id: docSnap.id, submittedAt } as AnalysisResult;
+    } else {
         return undefined;
     }
 };
 
-export const updateWithAiData = async (id: string, aiAnalysis: AnalyzeProcessOutput) => {
-    const existingData = await getData(id);
-    if (existingData) {
-        await saveData(id, { ...existingData, aiAnalysis });
-    }
+export const updateAssessmentWithAiData = async (userId: string, id: string, aiAnalysis: AnalyzeProcessOutput) => {
+    const db = getDb();
+    const docRef = doc(db, 'users', userId, 'assessments', id);
+    await updateDoc(docRef, {
+        aiAnalysis
+    });
 };
-
-// Type guard for file system errors
-function isErrnoException(error: unknown): error is NodeJS.ErrnoException {
-    return error instanceof Error && 'code' in error;
-}

@@ -6,34 +6,40 @@ import { randomUUID } from 'crypto';
 import { analyzeProcess } from '@/ai/flows/analyze-process-with-ai';
 import { formSchema, type FormValues } from '@/app/lib/schema';
 import { calculateScores } from '@/app/lib/scoring';
-import { saveData, getData, updateWithAiData } from '@/app/lib/data-store';
+import { getAssessment, updateAssessmentWithAiData } from '@/app/lib/data-store';
 import type { AnalyzeProcessInput } from '@/ai/flows/analyze-process-with-ai';
+import type { AnalysisResult } from '@/app/lib/data-store';
 
-export async function submitQuestionnaire(values: FormValues) {
+// This function is no longer called directly by the form, 
+// but it's kept as a reference or for potential future server-side submissions.
+// The primary submission logic is now in the QuestionnaireForm client component.
+export async function submitQuestionnaire(userId: string, values: FormValues) {
     const validatedFields = formSchema.safeParse(values);
 
     if (!validatedFields.success) {
-        // This should ideally not happen with client-side validation, but serves as a safeguard.
         throw new Error("Invalid form data submitted.");
     }
 
     const id = randomUUID();
     const { scores, flags } = calculateScores(validatedFields.data);
 
-    await saveData(id, {
-        id,
+    const analysisResult: Omit<AnalysisResult, 'id'> = {
         submittedAt: new Date(),
         formData: validatedFields.data,
         scores,
         flags,
-    });
+    };
+    
+    // The actual save operation is now client-side in the form.
+    // This function would need to be adapted if it were to be used.
+    // For now, it will just redirect.
     
     redirect(`/analysis/${id}`);
 }
 
 
-export async function getAiAnalysis(analysisId: string) {
-    const data = await getData(analysisId);
+export async function getAiAnalysis(userId: string, analysisId: string) {
+    const data = await getAssessment(userId, analysisId);
     if (!data) {
         throw new Error("Analysis not found.");
     }
@@ -86,7 +92,7 @@ export async function getAiAnalysis(analysisId: string) {
     
     try {
         const aiResult = await analyzeProcess(aiInput);
-        await updateWithAiData(analysisId, aiResult);
+        await updateAssessmentWithAiData(userId, analysisId, aiResult);
         return { success: true, data: aiResult };
     } catch (error) {
         console.error("AI Analysis failed:", error);

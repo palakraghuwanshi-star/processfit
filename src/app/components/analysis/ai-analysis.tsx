@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -16,11 +17,12 @@ import { Skeleton } from "@/components/ui/skeleton";
 import type { AnalyzeProcessOutput } from "@/ai/flows/analyze-process-with-ai";
 
 interface AiAnalysisProps {
+  userId: string;
   analysisId: string;
   initialAiAnalysis?: AnalyzeProcessOutput;
 }
 
-export function AiAnalysis({ analysisId, initialAiAnalysis }: AiAnalysisProps) {
+export function AiAnalysis({ userId, analysisId, initialAiAnalysis }: AiAnalysisProps) {
   const [analysis, setAnalysis] = React.useState<AnalyzeProcessOutput | undefined>(initialAiAnalysis);
   const [isLoading, setIsLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
@@ -30,7 +32,7 @@ export function AiAnalysis({ analysisId, initialAiAnalysis }: AiAnalysisProps) {
     setIsLoading(true);
     setError(null);
     try {
-      const result = await getAiAnalysis(analysisId);
+      const result = await getAiAnalysis(userId, analysisId);
       if (result.success) {
         setAnalysis(result.data);
       } else {

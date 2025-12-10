@@ -13,6 +13,7 @@ import { KeyInsights } from "@/app/components/analysis/key-insights";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
+import { Separator } from "@/components/ui/separator";
 
 export default function AnalysisPage() {
   const { id: analysisId } = useParams() as { id: string };
@@ -90,39 +91,45 @@ export default function AnalysisPage() {
 
 
   return (
-    <div className="min-h-screen w-full bg-background flex flex-col items-center justify-start py-8 sm:py-12 px-4">
-      <div className="w-full max-w-6xl">
-        <div className="mb-8 flex justify-between items-center">
-            <div>
-                <h1 className="font-headline text-4xl md:text-5xl font-bold text-foreground">
-                    Analysis Results
-                </h1>
-                <p className="mt-1 text-lg text-muted-foreground">
-                    For process: <span className="font-semibold text-primary">{data.formData.processName}</span>
-                </p>
+    <div className="min-h-screen w-full bg-slate-50 dark:bg-slate-950 flex flex-col items-center justify-start py-8 sm:py-12 px-4">
+      <div className="w-full max-w-4xl bg-background rounded-lg border shadow-sm">
+        <header className="p-6 sm:p-8 border-b">
+            <div className="flex justify-between items-start">
+                <div>
+                    <h1 className="text-3xl md:text-4xl font-bold text-foreground">
+                        Analysis Results
+                    </h1>
+                    <p className="mt-2 text-lg text-muted-foreground">
+                        For process: <span className="font-semibold text-primary">{data.formData.processName}</span>
+                    </p>
+                </div>
+                <Button asChild variant="outline">
+                    <Link href="/">
+                        <ArrowLeft className="mr-2 h-4 w-4" />
+                        New Analysis
+                    </Link>
+                </Button>
             </div>
-            <Button asChild variant="outline">
-                <Link href="/">
-                    <ArrowLeft className="mr-2 h-4 w-4" />
-                    New Analysis
-                </Link>
-            </Button>
-        </div>
+        </header>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-3">
-                <ScoreSummary scores={data.scores} totalScore={150} />
-            </div>
+        <main className="p-6 sm:p-8 space-y-12">
+            <ScoreSummary scores={data.scores} totalScore={150} />
 
-            <div className="lg:col-span-2 grid gap-6">
-                <ScoreBreakdown scores={data.scores} />
-            </div>
+            <Separator />
+            
+            <PriorityMatrix businessImpact={data.scores.businessImpact} feasibility={data.scores.feasibility} />
 
-            <div className="grid gap-6">
-                <PriorityMatrix businessImpact={data.scores.businessImpact} feasibility={data.scores.feasibility} />
-                <KeyInsights flags={data.flags} formData={data.formData} />
+            <Separator />
+
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
+                <div className="md:col-span-3">
+                    <ScoreBreakdown scores={data.scores} />
+                </div>
+                <div className="md:col-span-2">
+                     <KeyInsights flags={data.flags} formData={data.formData} />
+                </div>
             </div>
-        </div>
+        </main>
       </div>
     </div>
   );

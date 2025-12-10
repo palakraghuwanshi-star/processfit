@@ -1,13 +1,6 @@
 "use client";
 
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import type { AnalysisScores } from "@/app/lib/data-store";
 
 interface ScoreBreakdownProps {
@@ -32,15 +25,13 @@ export function ScoreBreakdown({ scores }: ScoreBreakdownProps) {
   ];
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="font-headline text-2xl">Score Breakdown</CardTitle>
-        <CardDescription>
-          How your process scored in each key area.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <ResponsiveContainer width="100%" height={350}>
+    <section>
+      <h2 className="text-2xl font-bold text-foreground">Score Breakdown</h2>
+      <p className="text-muted-foreground mt-1">
+          How your process scored in each key automation area.
+      </p>
+      <div className="mt-6">
+        <ResponsiveContainer width="100%" height={300}>
           <BarChart data={data} layout="vertical" margin={{ left: 20, right: 20 }}>
             <XAxis type="number" hide />
             <YAxis
@@ -85,7 +76,7 @@ export function ScoreBreakdown({ scores }: ScoreBreakdownProps) {
             <Bar dataKey="score" fill="hsl(var(--primary))" radius={[4, 4, 4, 4]} />
           </BarChart>
         </ResponsiveContainer>
-      </CardContent>
-    </Card>
+      </div>
+    </section>
   );
 }

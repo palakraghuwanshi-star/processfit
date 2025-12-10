@@ -1,26 +1,12 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import type { AnalysisScores } from "@/app/lib/data-store";
 
-const categoryPriority: Record<string, { priority: string; variant: "default" | "secondary" | "destructive" | "outline"}> = {
-    "QUICK WIN ⭐": { priority: "Highest", variant: "default"},
-    "STRATEGIC LONG-TERM": { priority: "High", variant: "secondary"},
-    "INCREMENTAL GAINS": { priority: "Medium", variant: "outline" },
-    "AVOID/REVISIT": { priority: "destructive", variant: "destructive"},
-}
-
-const categoryColors: Record<string, string> = {
-    "green": "bg-green-500",
-    "blue": "bg-blue-500",
-    "orange": "bg-orange-500",
-    "red": "bg-red-500",
+const categoryInfo: Record<string, { priority: string; description: string }> = {
+    "QUICK WIN ⭐": { priority: "Highest Priority", description: "High impact, high feasibility. These are prime candidates for automation." },
+    "STRATEGIC LONG-TERM": { priority: "High Priority", description: "High impact, but lower feasibility. Requires strategic planning and investment." },
+    "INCREMENTAL GAINS": { priority: "Medium Priority", description: "Lower impact, but high feasibility. Good for quick, smaller improvements." },
+    "AVOID/REVISIT": { priority: "Low Priority", description: "Low impact and low feasibility. Best to avoid or revisit after other priorities." },
 }
 
 interface ScoreSummaryProps {
@@ -30,36 +16,27 @@ interface ScoreSummaryProps {
 
 export function ScoreSummary({ scores, totalScore }: ScoreSummaryProps) {
   const percentage = Math.round((scores.totalScore / totalScore) * 100);
-  const priorityInfo = categoryPriority[scores.category] || { priority: 'N/A', variant: 'secondary' };
+  const priorityInfo = categoryInfo[scores.category] || { priority: 'N/A', description: 'Category not determined' };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="font-headline text-2xl">Score Summary</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+    <section>
+        <h2 className="text-2xl font-bold text-foreground">Overall Assessment</h2>
+        <p className="text-muted-foreground mt-1">A high-level summary of the automation potential.</p>
+        
+        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 text-center md:text-left">
           <div className="flex flex-col items-center justify-center p-4 rounded-lg bg-muted/50">
             <p className="text-4xl font-bold text-primary">{scores.totalScore}</p>
-            <p className="text-sm text-muted-foreground">Total Score (/{totalScore})</p>
+            <p className="text-sm text-muted-foreground mt-1">Total Score (out of {totalScore})</p>
           </div>
           <div className="flex flex-col items-center justify-center p-4 rounded-lg bg-muted/50">
             <p className="text-4xl font-bold text-primary">{percentage}%</p>
-            <p className="text-sm text-muted-foreground">Overall Fit</p>
+            <p className="text-sm text-muted-foreground mt-1">Overall Fit</p>
           </div>
-          <div className="flex flex-col items-center justify-center p-4 rounded-lg bg-muted/50">
-            <div className="flex items-center gap-2">
-                <div className={`h-3 w-3 rounded-full ${categoryColors[scores.color]}`}></div>
-                <p className="text-xl font-semibold">{scores.category}</p>
-            </div>
-            <p className="text-sm text-muted-foreground">Category</p>
-          </div>
-          <div className="flex flex-col items-center justify-center p-4 rounded-lg bg-muted/50">
-            <Badge variant={priorityInfo.variant} className="text-lg">{priorityInfo.priority}</Badge>
-            <p className="text-sm text-muted-foreground mt-2">Priority</p>
+          <div className="col-span-1 lg:col-span-2 flex flex-col items-center justify-center p-4 rounded-lg bg-muted/50 text-center">
+            <p className="text-xl font-semibold text-foreground">{scores.category}</p>
+            <p className="text-sm text-muted-foreground mt-1">{priorityInfo.description}</p>
           </div>
         </div>
-      </CardContent>
-    </Card>
+    </section>
   );
 }

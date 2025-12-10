@@ -29,30 +29,27 @@ export function PriorityMatrix({ businessImpact, feasibility }: PriorityMatrixPr
   const xPos = (feasibility / maxFeasibility) * 100;
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="font-headline text-2xl">Priority Matrix</CardTitle>
-        <CardDescription>
-          Your process plotted by impact vs. feasibility.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="relative aspect-square">
-        <div className="absolute inset-0 grid grid-cols-2 grid-rows-2">
-            <div className={cn("flex items-center justify-center p-2 text-center text-sm font-semibold border-r border-b", quadrantConfig["STRATEGIC LONG-TERM"])}>Strategic Long-Term</div>
-            <div className={cn("flex items-center justify-center p-2 text-center text-sm font-semibold border-b", quadrantConfig["QUICK WINS ⭐"])}>Quick Wins ⭐</div>
-            <div className={cn("flex items-center justify-center p-2 text-center text-sm font-semibold border-r", quadrantConfig["AVOID/REVISIT"])}>Avoid / Revisit</div>
-            <div className={cn("flex items-center justify-center p-2 text-center text-sm font-semibold", quadrantConfig["INCREMENTAL GAINS"])}>Incremental Gains</div>
+    <section>
+        <h2 className="text-2xl font-bold text-foreground">Priority Matrix</h2>
+        <p className="text-muted-foreground mt-1">Your process plotted by its business impact vs. technical feasibility.</p>
+
+        <div className="relative mt-6 aspect-video w-full max-w-2xl mx-auto">
+            <div className="absolute inset-0 grid grid-cols-2 grid-rows-2 rounded-lg border">
+                <div className="flex items-center justify-center p-4 text-center text-sm font-semibold border-r border-b bg-blue-500/5 text-blue-900 dark:text-blue-200">Strategic Long-Term</div>
+                <div className="flex items-center justify-center p-4 text-center text-sm font-semibold border-b bg-green-500/5 text-green-900 dark:text-green-200">Quick Wins ⭐</div>
+                <div className="flex items-center justify-center p-4 text-center text-sm font-semibold border-r bg-red-500/5 text-red-900 dark:text-red-200">Avoid / Revisit</div>
+                <div className="flex items-center justify-center p-4 text-center text-sm font-semibold bg-orange-500/5 text-orange-900 dark:text-orange-200">Incremental Gains</div>
+            </div>
+
+            <div
+            className="absolute w-4 h-4 rounded-full bg-primary ring-4 ring-primary/30 -translate-x-1/2 -translate-y-1/2 transition-all duration-500 ease-out"
+            style={{ top: `${yPos}%`, left: `${xPos}%` }}
+            title={`Your Process (Impact: ${businessImpact}, Feasibility: ${feasibility})`}
+            />
+
+            <div className="absolute -left-4 top-1/2 -translate-y-1/2 -rotate-90 text-xs font-bold uppercase text-muted-foreground tracking-wider origin-center">Business Impact →</div>
+            <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs font-bold uppercase text-muted-foreground tracking-wider">Feasibility →</div>
         </div>
-
-        <div
-          className="absolute w-4 h-4 rounded-full bg-primary ring-4 ring-primary/30 -translate-x-1/2 -translate-y-1/2 transition-all duration-500 ease-out"
-          style={{ top: `${yPos}%`, left: `${xPos}%` }}
-          title={`Your Process (Impact: ${businessImpact}, Feasibility: ${feasibility})`}
-        />
-
-        <div className="absolute -left-10 top-1/2 -translate-y-1/2 -rotate-90 text-xs font-bold uppercase text-muted-foreground tracking-wider">Business Impact</div>
-        <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs font-bold uppercase text-muted-foreground tracking-wider">Feasibility</div>
-      </CardContent>
-    </Card>
+    </section>
   );
 }

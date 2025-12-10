@@ -18,7 +18,6 @@ import {
   Info,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { randomUUID } from "crypto";
 
 import { useAuth, useUser } from "@/firebase";
 import { initiateAnonymousSignIn } from "@/firebase/non-blocking-login";
@@ -176,7 +175,12 @@ export function QuestionnaireForm() {
 
     setIsSubmitting(true);
     try {
-        const id = randomUUID();
+        // Generate a simple client-side UUID
+        const id = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
+
         const { scores, flags } = calculateScores(data);
 
         await saveAssessment(user.uid, id, {
@@ -536,7 +540,7 @@ const Section6 = () => (
                                 {Options.sopStatusOptions.map(o => (
                                     <FormItem key={o} className="flex items-center space-x-3 space-y-0">
                                         <FormControl><RadioGroupItem value={o} /></FormControl>
-                                        <FormLabel className="font-normal">{o}</FormLabel>
+                                        <FormLabel className="font-normal">{o}</FormLabel>_
                                     </FormItem>
                                 ))}
                             </RadioGroup>

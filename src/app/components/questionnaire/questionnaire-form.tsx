@@ -47,6 +47,11 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 
 import * as Options from "@/app/lib/form-options";
+import { useRouter } from "next/navigation";
+import { randomUUID } from "crypto";
+import { saveData } from "@/app/lib/data-store";
+import { calculateScores } from "@/app/lib/scoring";
+
 
 const formSections = [
   {
@@ -96,6 +101,7 @@ export function QuestionnaireForm() {
   const [currentStep, setCurrentStep] = React.useState(0);
   const [isPending, startTransition] = React.useTransition();
   const { toast } = useToast();
+  const router = useRouter();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -103,18 +109,28 @@ export function QuestionnaireForm() {
       organizationName: "",
       yourName: "",
       processName: "",
+      industry: undefined,
       processDescription: "",
-      monthlyVolume: '',
-      teamSize: '',
-      timePercentage: '',
-      costPerTransaction: '',
+      monthlyVolume: '' as unknown as number,
+      processFrequency: undefined,
+      teamSize: '' as unknown as number,
+      timePercentage: '' as unknown as number,
+      averageProcessingTime: undefined,
+      costPerTransaction: '' as unknown as number,
       currentChallenges: [],
       biggestPainPoint: "",
-      errorRate: '',
+      errorRate: '' as unknown as number,
       complianceRequirements: [],
-      processStandardization: '',
-      exceptionHandling: '',
+      impactOfDelays: undefined,
+      processStandardization: '' as unknown as number,
+      documentationStatus: undefined,
+      exceptionHandling: '' as unknown as number,
       systems: [{ name: "", hasApi: "Yes", isCloud: "Yes" }],
+      systemAccess: undefined,
+      processBottleneck: undefined,
+      stakeholderComplaints: undefined,
+      growthLimitation: undefined,
+      expectedROI: undefined,
     },
   });
 
@@ -138,7 +154,18 @@ export function QuestionnaireForm() {
 
   const onSubmit = (data: FormValues) => {
     startTransition(async () => {
-      await submitQuestionnaire(data);
+        const id = crypto.randomUUID();
+        const { scores, flags } = calculateScores(data);
+
+        saveData(id, {
+            id,
+            submittedAt: new Date(),
+            formData: data,
+            scores,
+            flags,
+        });
+
+        router.push(`/analysis/${id}`);
     });
   };
 
@@ -342,13 +369,11 @@ const Section3 = () => (
                     <FormItem>
                         <FormLabel>What is the estimated cost to process a single transaction?</FormLabel>
                         <FormControl><Input type="number" placeholder="e.g., 25" startIcon="$" {...field} /></FormControl>
+                         <FormDescription className="flex items-center gap-1.5"><Info className="h-3 w-3"/>Include labor time and overhead for one transaction. If unsure, estimate: (Total monthly process cost) ÷ (Monthly transaction volume)</FormDescription>
                         <FormMessage />
                     </FormItem>
                 )} />
             </div>
-             <FormItem>
-                <FormDescription className="flex items-center gap-1.5"><Info className="h-3 w-3"/>Include labor time, overhead for one transaction. If unsure, estimate: (Total monthly process cost) ÷ (Monthly transaction volume)</FormDescription>
-             </FormItem>
         </div>
     </div>
 );

@@ -46,7 +46,7 @@ export function SystemsInput() {
                 animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}
                 transition={{ duration: 0.3 }}
-                className="p-4 border rounded-lg bg-background/50 space-y-4"
+                className="p-4 border rounded-lg bg-card space-y-4"
               >
                 <div className="flex justify-between items-center">
                     <p className="font-medium">System #{index + 1}</p>
@@ -145,3 +145,4 @@ export function SystemsInput() {
     </div>
   );
 }
+

@@ -14,10 +14,17 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { getAllAssessments, type AnalysisResult } from '@/app/lib/data-store';
 import { format } from 'date-fns';
 import { Header } from '@/app/components/header';
+import { KnowledgeBase } from '@/app/components/admin/knowledge-base';
 
 export default function AdminDashboardPage() {
   const { user, isUserLoading } = useUser();
@@ -97,11 +104,7 @@ export default function AdminDashboardPage() {
             <Button onClick={handleSignOut}>Sign Out</Button>
         </div>
         
-        {isLoading ? (
-          <div className="flex w-full items-center justify-center py-20">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          </div>
-        ) : error ? (
+        {error ? (
           <div className="text-center py-20 border rounded-lg bg-card text-destructive p-4">
             <p className="font-semibold text-lg">Access Denied</p>
             <p className="text-muted-foreground mt-2 font-mono text-sm whitespace-pre-wrap">
@@ -112,52 +115,69 @@ export default function AdminDashboardPage() {
             </Button>
           </div>
         ) : (
-          <div className="border rounded-lg">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Process Name</TableHead>
-                  <TableHead>Submitted At</TableHead>
-                  <TableHead>Total Score</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {assessments.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={5} className="text-center h-24">
-                      No assessments submitted yet.
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  assessments.map(assessment => (
-                    <TableRow key={assessment.id}>
-                      <TableCell className="font-medium">{assessment.formData.processName}</TableCell>
-                      <TableCell>
-                        {assessment.submittedAt ? format(new Date(assessment.submittedAt), 'MMM d, yyyy') : 'N/A'}
-                      </TableCell>
-                      <TableCell>{assessment.scores.totalScore}</TableCell>
-                      <TableCell>
-                        <Badge variant={getCategoryVariant(assessment.scores.category)}>
-                          {assessment.scores.category}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => router.push(`/analysis/${assessment.id}`)}
-                        >
-                          View Report
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
+          <Tabs defaultValue="assessments" className="w-full">
+            <TabsList className="grid w-full grid-cols-2 max-w-md mb-6">
+              <TabsTrigger value="assessments">Assessments</TabsTrigger>
+              <TabsTrigger value="knowledgeBase">Knowledge Base</TabsTrigger>
+            </TabsList>
+            <TabsContent value="assessments">
+              {isLoading ? (
+                <div className="flex w-full items-center justify-center py-20">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                </div>
+              ) : (
+                <div className="border rounded-lg">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Process Name</TableHead>
+                        <TableHead>Submitted At</TableHead>
+                        <TableHead>Total Score</TableHead>
+                        <TableHead>Category</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {assessments.length === 0 ? (
+                        <TableRow>
+                          <TableCell colSpan={5} className="text-center h-24">
+                            No assessments submitted yet.
+                          </TableCell>
+                        </TableRow>
+                      ) : (
+                        assessments.map(assessment => (
+                          <TableRow key={assessment.id}>
+                            <TableCell className="font-medium">{assessment.formData.processName}</TableCell>
+                            <TableCell>
+                              {assessment.submittedAt ? format(new Date(assessment.submittedAt), 'MMM d, yyyy') : 'N/A'}
+                            </TableCell>
+                            <TableCell>{assessment.scores.totalScore}</TableCell>
+                            <TableCell>
+                              <Badge variant={getCategoryVariant(assessment.scores.category)}>
+                                {assessment.scores.category}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => router.push(`/analysis/${assessment.id}`)}
+                              >
+                                View Report
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))
+                      )}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
+            </TabsContent>
+            <TabsContent value="knowledgeBase">
+              <KnowledgeBase />
+            </TabsContent>
+          </Tabs>
         )}
       </main>
     </div>

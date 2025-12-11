@@ -29,6 +29,7 @@ import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 
 import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
 import { SystemsInput } from './systems-input';
 
 import {
@@ -213,27 +214,18 @@ export function QuestionnaireForm() {
   };
 
   const isPending = isSubmitting || isUserLoading;
+  const progressValue = ((currentStep + 1) / formSections.length) * 100;
 
   return (
     <FormProvider {...form}>
-      <div className="mb-8 border-b">
-        <div className="flex justify-start space-x-8 overflow-x-auto pb-4">
-          {formSections.map((section, index) => (
-            <button
-              key={section.title}
-              onClick={() => setCurrentStep(index)}
-              className={cn(
-                'pb-3 text-sm font-medium text-muted-foreground transition-colors whitespace-nowrap',
-                currentStep === index
-                  ? 'text-primary border-b-2 border-primary'
-                  : 'hover:text-foreground'
-              )}
-              disabled={isPending}
-            >
-              {section.title}
-            </button>
-          ))}
-        </div>
+      <div className="mb-12 text-center">
+        <h2 className="text-lg font-medium text-primary">
+            Section {currentStep + 1} of {formSections.length}
+        </h2>
+        <p className="text-2xl font-bold text-foreground mt-1">
+            {formSections[currentStep].title}
+        </p>
+        <Progress value={progressValue} className="w-full max-w-md mx-auto mt-4" />
       </div>
 
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 mt-12">
@@ -928,7 +920,7 @@ const Section7 = () => (
             <FormLabel>How often do you receive complaints about this process?</FormLabel>
             <FormControl>
               <RadioGroup
-                onValueChange={field.onChange}
+                onValue-change={field.onChange}
                 defaultValue={field.value}
                 className="space-y-2 pt-1"
               >

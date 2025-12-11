@@ -1,4 +1,3 @@
-
 'use client';
 
 import * as React from 'react';
@@ -29,7 +28,7 @@ export function MultiStepProgressBar({ sections, currentStep, onStepClick }: Mul
               type="button"
               onClick={() => onStepClick(index)}
               className={cn(
-                'flex flex-col items-center text-center focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md p-2 cursor-pointer'
+                'flex flex-col items-center text-center focus:outline-none rounded-md p-2 cursor-pointer'
               )}
             >
               <div

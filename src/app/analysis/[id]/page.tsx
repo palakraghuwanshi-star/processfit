@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
+import { Header } from "@/app/components/header";
 
 export default function AnalysisPage() {
   const { id: analysisId } = useParams() as { id: string };
@@ -96,8 +97,9 @@ export default function AnalysisPage() {
 
 
   return (
-    <div className="min-h-screen w-full bg-slate-50 dark:bg-slate-950 flex flex-col items-center justify-start py-8 sm:py-12 px-4">
-      <div className="w-full max-w-4xl bg-background rounded-lg border shadow-sm">
+    <div className="min-h-screen w-full bg-slate-50 dark:bg-slate-950 flex flex-col items-center justify-start pb-16">
+      <Header />
+      <div className="w-full max-w-4xl bg-background rounded-lg border shadow-sm mt-8">
         <header className="p-6 sm:p-8 border-b">
             <div className="flex justify-between items-start">
                 <div>
@@ -109,7 +111,7 @@ export default function AnalysisPage() {
                     </p>
                 </div>
                 <Button asChild variant="outline">
-                    <Link href={isAdmin ? "/admin/dashboard" : "/"}>
+                    <Link href={isAdmin ? "/admin/dashboard" : "/assessment"}>
                         <ArrowLeft className="mr-2 h-4 w-4" />
                         {isAdmin ? "Back to Dashboard" : "New Analysis"}
                     </Link>
@@ -130,7 +132,7 @@ export default function AnalysisPage() {
                      <KeyInsights flags={data.flags} formData={data.formData} />
                 </div>
             </div>
-            {isAdmin && (
+            {(isAdmin || user.uid) && (
                 <>
                     <Separator />
                     <FullResponses formData={data.formData} />

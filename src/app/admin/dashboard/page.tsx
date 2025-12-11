@@ -17,6 +17,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { getAllAssessments, type AnalysisResult } from '@/app/lib/data-store';
 import { format } from 'date-fns';
+import { Logo } from '@/app/components/logo';
 
 export default function AdminDashboardPage() {
   const { user, isUserLoading } = useUser();
@@ -63,7 +64,7 @@ export default function AdminDashboardPage() {
   }, [user, isUserLoading, router]);
 
 
-  if (isUserLoading || !user) {
+  if (isUserLoading || (!user && isLoading)) {
     return (
       <div className="flex min-h-screen w-full items-center justify-center bg-background">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
@@ -88,9 +89,12 @@ export default function AdminDashboardPage() {
   return (
     <div className="min-h-screen w-full bg-background flex flex-col items-center justify-start pt-8 sm:pt-12 pb-16 px-4">
       <header className="w-full max-w-6xl flex items-center justify-between mb-10">
-        <h1 className="font-headline text-3xl md:text-4xl font-semibold text-foreground">
-          Admin Dashboard
-        </h1>
+        <div className="flex items-center gap-2 font-bold text-xl">
+            <Logo className="h-8 w-8 text-primary" />
+            <h1 className="font-headline text-3xl md:text-4xl font-semibold text-foreground">
+                Admin Dashboard
+            </h1>
+        </div>
         <Button onClick={handleSignOut}>Sign Out</Button>
       </header>
       <main className="w-full max-w-6xl">

@@ -161,22 +161,30 @@ export function QuestionnaireForm() {
     }
   };
 
-  const nextStep = async () => {
-    const fieldsToValidate = formSections[currentStep].fields as FieldName[];
-    const isValid = await form.trigger(fieldsToValidate);
-    if (isValid) {
-      setCurrentStep(prev => prev + 1);
-    } else {
-      toast({
-        variant: 'destructive',
-        title: 'Validation Error',
-        description: 'Please fill out all required fields before proceeding.',
-      });
-    }
+  const nextStep = () => {
+    setCurrentStep(prev => prev + 1);
   };
 
   const prevStep = () => {
     setCurrentStep(prev => prev - 1);
+  };
+
+  const onValidationErrors = (errors: any) => {
+    toast({
+        variant: 'destructive',
+        title: 'Validation Error',
+        description: 'Please fill out all required fields before submitting.',
+    });
+
+    // Find the first section with an error and navigate to it
+    for (let i = 0; i < formSections.length; i++) {
+        const sectionFields = formSections[i].fields;
+        const hasError = sectionFields.some(field => errors[field]);
+        if (hasError) {
+            setCurrentStep(i);
+            return;
+        }
+    }
   };
 
   const onSubmit = async (data: FormValues) => {
@@ -228,7 +236,7 @@ export function QuestionnaireForm() {
             <MultiStepProgressBar sections={formSections} currentStep={currentStep} onStepClick={goToStep} />
         </div>
 
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 mt-12">
+        <form onSubmit={form.handleSubmit(onSubmit, onValidationErrors)} className="space-y-8 mt-12">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentStep}

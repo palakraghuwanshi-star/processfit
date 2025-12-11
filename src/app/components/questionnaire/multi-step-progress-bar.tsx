@@ -22,17 +22,14 @@ export function MultiStepProgressBar({ sections, currentStep, onStepClick }: Mul
       {sections.map((section, index) => {
         const isCompleted = index < currentStep;
         const isActive = index === currentStep;
-        const isClickable = index <= currentStep;
 
         return (
           <React.Fragment key={section.title}>
             <button
               type="button"
-              onClick={() => isClickable && onStepClick(index)}
-              disabled={!isClickable}
+              onClick={() => onStepClick(index)}
               className={cn(
-                'flex flex-col items-center text-center focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md p-2',
-                isClickable ? 'cursor-pointer' : 'cursor-not-allowed'
+                'flex flex-col items-center text-center focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md p-2 cursor-pointer'
               )}
             >
               <div

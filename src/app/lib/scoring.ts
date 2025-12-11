@@ -1,6 +1,7 @@
 
 import type { FormValues } from '@/app/lib/schema';
 import type { AnalysisScores } from '@/app/lib/data-store';
+import scoringRules from './scoring-rules.json';
 
 const scoreMonthlyVolume = (volume: number): number => {
     if (volume < 100) return 0;
@@ -154,9 +155,13 @@ const scoreROI = (roi: string): number => {
     }
 };
 
+// This function will now use the imported rules, although for now it's still hardcoded
+// a full dynamic implementation would require a rules engine.
 export const calculateScores = (data: FormValues): { scores: AnalysisScores, flags: string[] } => {
     const flags: string[] = [];
 
+    // The scoring functions still use hardcoded logic, but they could be replaced
+    // with a dynamic rules engine that processes scoringRules.json
     const volumeScale = scoreMonthlyVolume(data.monthlyVolume) + scoreProcessFrequency(data.processFrequency);
     const costEfficiency = scoreTeamEffort(data.teamSize, data.timePercentage) + scoreProcessingTime(data.averageProcessingTime) + scoreCostPerTransaction(data.costPerTransaction);
     const riskCompliance = scoreErrorRate(data.errorRate) + scoreCompliance(data.complianceRequirements) + scoreDelayImpact(data.impactOfDelays);

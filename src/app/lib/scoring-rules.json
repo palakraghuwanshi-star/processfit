@@ -1,0 +1,130 @@
+{
+    "scoringCategories": [
+        {
+            "title": "Volume & Scale (Max: 20 points)",
+            "description": "Measures the transaction load and frequency of the process.",
+            "rules": [
+                { "criteria": "Monthly Volume: < 100", "score": "0 pts" },
+                { "criteria": "Monthly Volume: 100-500", "score": "2 pts" },
+                { "criteria": "Monthly Volume: 501-1000", "score": "4 pts" },
+                { "criteria": "Monthly Volume: 1001-2500", "score": "6 pts" },
+                { "criteria": "Monthly Volume: 2501-5000", "score": "8 pts" },
+                { "criteria": "Monthly Volume: > 5000", "score": "10 pts" },
+                { "criteria": "Frequency: Annually/Quarterly", "score": "2 pts" },
+                { "criteria": "Frequency: Monthly", "score": "4 pts" },
+                { "criteria": "Frequency: Weekly", "score": "6 pts" },
+                { "criteria": "Frequency: Daily", "score": "8 pts" },
+                { "criteria": "Frequency: Continuous", "score": "10 pts" }
+            ]
+        },
+        {
+            "title": "Cost & Efficiency (Max: 30 points)",
+            "description": "Evaluates the human effort, time, and cost associated with the process.",
+            "rules": [
+                { "criteria": "Team Effort (FTE Hours): < 40", "score": "0 pts" },
+                { "criteria": "Team Effort (FTE Hours): 40-80", "score": "2 pts" },
+                { "criteria": "Team Effort (FTE Hours): 81-120", "score": "4 pts" },
+                { "criteria": "Team Effort (FTE Hours): 121-160", "score": "6 pts" },
+                { "criteria": "Team Effort (FTE Hours): 161-200", "score": "8 pts" },
+                { "criteria": "Team Effort (FTE Hours): > 200", "score": "10 pts" },
+                { "criteria": "Processing Time: < 1 day", "score": "2 pts" },
+                { "criteria": "Processing Time: 1-2 days", "score": "4 pts" },
+                { "criteria": "Processing Time: 3-5 days", "score": "6 pts" },
+                { "criteria": "Processing Time: 6-10 days", "score": "8 pts" },
+                { "criteria": "Processing Time: > 10 days", "score": "10 pts" },
+                { "criteria": "Cost per Transaction: < $5", "score": "1 pt" },
+                { "criteria": "Cost per Transaction: $5-$10", "score": "3 pts" },
+                { "criteria": "Cost per Transaction: $11-$25", "score": "5 pts" },
+                { "criteria": "Cost per Transaction: $26-$50", "score": "7 pts" },
+                { "criteria": "Cost per Transaction: $51-$100", "score": "9 pts" },
+                { "criteria": "Cost per Transaction: > $100", "score": "10 pts" }
+            ]
+        },
+        {
+            "title": "Risk & Compliance (Max: 30 points)",
+            "description": "Assesses the process based on its error rate, compliance needs, and impact of delays.",
+            "rules": [
+                { "criteria": "Error Rate: < 1%", "score": "1 pt" },
+                { "criteria": "Error Rate: 1-2%", "score": "2 pts" },
+                { "criteria": "Error Rate: 3-5%", "score": "4 pts" },
+                { "criteria": "Error Rate: 6-10%", "score": "6 pts" },
+                { "criteria": "Error Rate: 11-15%", "score": "8 pts" },
+                { "criteria": "Error Rate: 16-20%", "score": "9 pts" },
+                { "criteria": "Error Rate: > 20%", "score": "10 pts" },
+                { "criteria": "Compliance: None", "score": "2 pts" },
+                { "criteria": "Compliance: Internal audit", "score": "4 pts" },
+                { "criteria": "Compliance: Industry standards", "score": "6 pts" },
+                { "criteria": "Compliance: Government regulations", "score": "8 pts" },
+                { "criteria": "Compliance: Multiple high-level regulations", "score": "10 pts" },
+                { "criteria": "Impact of Delay: Minimal", "score": "1 pt" },
+                { "criteria": "Impact of Delay: Inconvenience", "score": "3 pts" },
+                { "criteria": "Impact of Delay: Cash flow impact", "score": "5 pts" },
+                { "criteria": "Impact of Delay: Financial penalties", "score": "7 pts" },
+                { "criteria": "Impact of Delay: Major penalties/relationship damage", "score": "10 pts" }
+            ]
+        },
+        {
+            "title": "Feasibility (Max: 30 points)",
+            "description": "Determines the technical viability of automating the process.",
+            "rules": [
+                { "criteria": "Standardization: < 30%", "score": "1 pt" },
+                { "criteria": "Standardization: 30-50%", "score": "3 pts" },
+                { "criteria": "Standardization: 51-70%", "score": "5 pts" },
+                { "criteria": "Standardization: 71-80%", "score": "7 pts" },
+                { "criteria": "Standardization: 81-90%", "score": "9 pts" },
+                { "criteria": "Standardization: > 90%", "score": "10 pts" },
+                { "criteria": "Documentation: None", "score": "0 pts" },
+                { "criteria": "Documentation: Partial", "score": "3 pts" },
+                { "criteria": "Documentation: Outdated", "score": "5 pts" },
+                { "criteria": "Documentation: Fully documented & current", "score": "10 pts" },
+                { "criteria": "Exception Rate: < 5%", "score": "10 pts" },
+                { "criteria": "Exception Rate: 5-10%", "score": "8 pts" },
+                { "criteria": "Exception Rate: 11-15%", "score": "6 pts" },
+                { "criteria": "Exception Rate: 16-20%", "score": "4 pts" },
+                { "criteria": "Exception Rate: 21-30%", "score": "2 pts" },
+                { "criteria": "Exception Rate: > 30%", "score": "0 pts" },
+                { "criteria": "API Access: All systems have APIs", "score": "10 pts" },
+                { "criteria": "API Access: Mixed (some with, some without)", "score": "6 pts" },
+                { "criteria": "API Access: Any \"No\" or \"Don't know\" responses", "score": "4 pts" },
+                { "criteria": "System Access: All cloud-based", "score": "10 pts" },
+                { "criteria": "System Access: VPN required", "score": "8 pts" },
+                { "criteria": "System Access: Some internal only", "score": "5 pts" },
+                { "criteria": "System Access: All internal only", "score": "2 pts" }
+            ]
+        },
+        {
+            "title": "Strategic Impact (Max: 40 points)",
+            "description": "Measures how automating this process aligns with broader business goals.",
+            "rules": [
+                { "criteria": "Bottleneck: No", "score": "2 pts" },
+                { "criteria": "Bottleneck: Minimal", "score": "4 pts" },
+                { "criteria": "Bottleneck: Moderate", "score": "7 pts" },
+                { "criteria": "Bottleneck: Significant blocker", "score": "10 pts" },
+                { "criteria": "Complaints: Rarely/never", "score": "1 pt" },
+                { "criteria": "Complaints: Occasionally", "score": "4 pts" },
+                { "criteria": "Complaints: Regularly", "score": "7 pts" },
+                { "criteria": "Complaints: Frequently", "score": "10 pts" },
+                { "criteria": "Growth Limitation: No constraints", "score": "2 pts" },
+                { "criteria": "Growth Limitation: Minor", "score": "4 pts" },
+                { "criteria": "Growth Limitation: Moderate", "score": "7 pts" },
+                { "criteria": "Growth Limitation: Major", "score": "10 pts" },
+                { "criteria": "Expected ROI: > 3 years", "score": "2 pts" },
+                { "criteria": "Expected ROI: 2-3 years", "score": "4 pts" },
+                { "criteria": "Expected ROI: 18-24 months", "score": "5 pts" },
+                { "criteria": "Expected ROI: 12-18 months", "score": "7 pts" },
+                { "criteria": "Expected ROI: 6-12 months", "score": "9 pts" },
+                { "criteria": "Expected ROI: < 6 months", "score": "10 pts" }
+            ]
+        },
+        {
+            "title": "Process Categorization",
+            "description": "The final recommendation is based on the combination of Business Impact and Feasibility scores.",
+            "rules": [
+                { "criteria": "Business Impact >= 90 AND Feasibility >= 25", "score": "QUICK WIN ⭐" },
+                { "criteria": "Business Impact >= 90 AND Feasibility < 25", "score": "STRATEGIC LONG-TERM" },
+                { "criteria": "Business Impact < 90 AND Feasibility >= 25", "score": "INCREMENTAL GAINS" },
+                { "criteria": "Business Impact < 90 AND Feasibility < 25", "score": "AVOID/REVISIT" }
+            ]
+        }
+    ]
+}

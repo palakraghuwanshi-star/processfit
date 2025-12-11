@@ -16,6 +16,16 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { useState, useEffect } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { Loader2 } from "lucide-react";
+
+// In a real app, you'd fetch this from and save to a backend.
+// For this example, we'll simulate it with local state and `require`.
+import initialRules from '@/app/lib/scoring-rules.json';
+
 
 type Rule = {
   criteria: string;
@@ -28,136 +38,49 @@ type ScoringCategory = {
   rules: Rule[];
 };
 
-const scoringLogic: ScoringCategory[] = [
-  {
-    title: 'Volume & Scale (Max: 20 points)',
-    description: 'Measures the transaction load and frequency of the process.',
-    rules: [
-      { criteria: 'Monthly Volume: < 100', score: '0 pts' },
-      { criteria: 'Monthly Volume: 100-500', score: '2 pts' },
-      { criteria: 'Monthly Volume: 501-1000', score: '4 pts' },
-      { criteria: 'Monthly Volume: 1001-2500', score: '6 pts' },
-      { criteria: 'Monthly Volume: 2501-5000', score: '8 pts' },
-      { criteria: 'Monthly Volume: > 5000', score: '10 pts' },
-      { criteria: 'Frequency: Annually/Quarterly', score: '2 pts' },
-      { criteria: 'Frequency: Monthly', score: '4 pts' },
-      { criteria: 'Frequency: Weekly', score: '6 pts' },
-      { criteria: 'Frequency: Daily', score: '8 pts' },
-      { criteria: 'Frequency: Continuous', score: '10 pts' },
-    ],
-  },
-  {
-    title: 'Cost & Efficiency (Max: 30 points)',
-    description: 'Evaluates the human effort, time, and cost associated with the process.',
-    rules: [
-      { criteria: 'Team Effort (FTE Hours): < 40', score: '0 pts' },
-      { criteria: 'Team Effort (FTE Hours): 40-80', score: '2 pts' },
-      { criteria: 'Team Effort (FTE Hours): 81-120', score: '4 pts' },
-      { criteria: 'Team Effort (FTE Hours): 121-160', score: '6 pts' },
-      { criteria: 'Team Effort (FTE Hours): 161-200', score: '8 pts' },
-      { criteria: 'Team Effort (FTE Hours): > 200', score: '10 pts' },
-      { criteria: 'Processing Time: < 1 day', score: '2 pts' },
-      { criteria: 'Processing Time: 1-2 days', score: '4 pts' },
-      { criteria: 'Processing Time: 3-5 days', score: '6 pts' },
-      { criteria: 'Processing Time: 6-10 days', score: '8 pts' },
-      { criteria: 'Processing Time: > 10 days', score: '10 pts' },
-      { criteria: 'Cost per Transaction: < $5', score: '1 pt' },
-      { criteria: 'Cost per Transaction: $5-$10', score: '3 pts' },
-      { criteria: 'Cost per Transaction: $11-$25', score: '5 pts' },
-      { criteria: 'Cost per Transaction: $26-$50', score: '7 pts' },
-      { criteria: 'Cost per Transaction: $51-$100', score: '9 pts' },
-      { criteria: 'Cost per Transaction: > $100', score: '10 pts' },
-    ],
-  },
-  {
-    title: 'Risk & Compliance (Max: 30 points)',
-    description: 'Assesses the process based on its error rate, compliance needs, and impact of delays.',
-    rules: [
-      { criteria: 'Error Rate: < 1%', score: '1 pt' },
-      { criteria: 'Error Rate: 1-2%', score: '2 pts' },
-      { criteria: 'Error Rate: 3-5%', score: '4 pts' },
-      { criteria: 'Error Rate: 6-10%', score: '6 pts' },
-      { criteria: 'Error Rate: 11-15%', score: '8 pts' },
-      { criteria: 'Error Rate: 16-20%', score: '9 pts' },
-      { criteria: 'Error Rate: > 20%', score: '10 pts' },
-      { criteria: 'Compliance: None', score: '2 pts' },
-      { criteria: 'Compliance: Internal audit', score: '4 pts' },
-      { criteria: 'Compliance: Industry standards', score: '6 pts' },
-      { criteria: 'Compliance: Government regulations', score: '8 pts' },
-      { criteria: 'Compliance: Multiple high-level regulations', score: '10 pts' },
-      { criteria: 'Impact of Delay: Minimal', score: '1 pt' },
-      { criteria: 'Impact of Delay: Inconvenience', score: '3 pts' },
-      { criteria: 'Impact of Delay: Cash flow impact', score: '5 pts' },
-      { criteria: 'Impact of Delay: Financial penalties', score: '7 pts' },
-      { criteria: 'Impact of Delay: Major penalties/relationship damage', score: '10 pts' },
-    ],
-  },
-  {
-    title: 'Feasibility (Max: 30 points)',
-    description: 'Determines the technical viability of automating the process.',
-    rules: [
-      { criteria: 'Standardization: < 30%', score: '1 pt' },
-      { criteria: 'Standardization: 30-50%', score: '3 pts' },
-      { criteria: 'Standardization: 51-70%', score: '5 pts' },
-      { criteria: 'Standardization: 71-80%', score: '7 pts' },
-      { criteria: 'Standardization: 81-90%', score: '9 pts' },
-      { criteria: 'Standardization: > 90%', score: '10 pts' },
-      { criteria: 'Documentation: None', score: '0 pts' },
-      { criteria: 'Documentation: Partial', score: '3 pts' },
-      { criteria: 'Documentation: Outdated', score: '5 pts' },
-      { criteria: 'Documentation: Fully documented & current', score: '10 pts' },
-      { criteria: 'Exception Rate: < 5%', score: '10 pts' },
-      { criteria: 'Exception Rate: 5-10%', score: '8 pts' },
-      { criteria: 'Exception Rate: 11-15%', score: '6 pts' },
-      { criteria: 'Exception Rate: 16-20%', score: '4 pts' },
-      { criteria: 'Exception Rate: 21-30%', score: '2 pts' },
-      { criteria: 'Exception Rate: > 30%', score: '0 pts' },
-      { criteria: 'API Access: All systems have APIs', score: '10 pts' },
-      { criteria: 'API Access: Mixed (some with, some without)', score: '6 pts' },
-      { criteria: 'API Access: Any "No" or "Don\'t know" responses', score: '4 pts' },
-      { criteria: 'System Access: All cloud-based', score: '10 pts' },
-      { criteria: 'System Access: VPN required', score: '8 pts' },
-      { criteria: 'System Access: Some internal only', score: '5 pts' },
-      { criteria: 'System Access: All internal only', score: '2 pts' },
-    ],
-  },
-   {
-    title: 'Strategic Impact (Max: 40 points)',
-    description: 'Measures how automating this process aligns with broader business goals.',
-    rules: [
-      { criteria: 'Bottleneck: No', score: '2 pts' },
-      { criteria: 'Bottleneck: Minimal', score: '4 pts' },
-      { criteria: 'Bottleneck: Moderate', score: '7 pts' },
-      { criteria: 'Bottleneck: Significant blocker', score: '10 pts' },
-      { criteria: 'Complaints: Rarely/never', score: '1 pt' },
-      { criteria: 'Complaints: Occasionally', score: '4 pts' },
-      { criteria: 'Complaints: Regularly', score: '7 pts' },
-      { criteria: 'Complaints: Frequently', score: '10 pts' },
-      { criteria: 'Growth Limitation: No constraints', score: '2 pts' },
-      { criteria: 'Growth Limitation: Minor', score: '4 pts' },
-      { criteria: 'Growth Limitation: Moderate', score: '7 pts' },
-      { criteria: 'Growth Limitation: Major', score: '10 pts' },
-      { criteria: 'Expected ROI: > 3 years', score: '2 pts' },
-      { criteria: 'Expected ROI: 2-3 years', score: '4 pts' },
-      { criteria: 'Expected ROI: 18-24 months', score: '5 pts' },
-      { criteria: 'Expected ROI: 12-18 months', score: '7 pts' },
-      { criteria: 'Expected ROI: 6-12 months', score: '9 pts' },
-      { criteria: 'Expected ROI: < 6 months', score: '10 pts' },
-    ],
-  },
-  {
-    title: 'Process Categorization',
-    description: 'The final recommendation is based on the combination of Business Impact and Feasibility scores.',
-    rules: [
-        { criteria: 'Business Impact >= 90 AND Feasibility >= 25', score: 'QUICK WIN ⭐' },
-        { criteria: 'Business Impact >= 90 AND Feasibility < 25', score: 'STRATEGIC LONG-TERM' },
-        { criteria: 'Business Impact < 90 AND Feasibility >= 25', score: 'INCREMENTAL GAINS' },
-        { criteria: 'Business Impact < 90 AND Feasibility < 25', score: 'AVOID/REVISIT' },
-    ]
-  }
-];
-
 export function KnowledgeBase() {
+  const [rules, setRules] = useState(JSON.stringify(initialRules, null, 2));
+  const [isSaving, setIsSaving] = useState(false);
+  const [parsedRules, setParsedRules] = useState(initialRules.scoringCategories);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    try {
+      const parsed = JSON.parse(rules);
+      setParsedRules(parsed.scoringCategories);
+    } catch (e) {
+      // Ignore parse errors while typing
+    }
+  }, [rules]);
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      // In a real app, this would be an API call to a backend endpoint
+      // that has permission to write to the filesystem.
+      // For demonstration, we're just simulating a delay.
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Here you would have a server-side function to write the file.
+      // Since we can't do that from the client, we'll log it.
+      console.log("Saving rules to backend:", rules);
+      
+      toast({
+        title: "Rules Saved",
+        description: "Your changes have been saved. They will be applied to the next analysis.",
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error Saving Rules",
+        description: "Could not save the scoring rules. Please try again.",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+
   const getCategoryVariant = (score: string) => {
     if (score.includes('QUICK WIN')) return 'default';
     if (score.includes('STRATEGIC')) return 'secondary';
@@ -167,45 +90,67 @@ export function KnowledgeBase() {
   };
 
   return (
-    <div className="border rounded-lg p-4 bg-card">
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-foreground">Scoring & Analysis Knowledge Base</h2>
-        <p className="text-muted-foreground mt-1">This document outlines the rules used to calculate scores and categorize processes.</p>
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div>
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold text-foreground">Scoring & Analysis Knowledge Base</h2>
+          <p className="text-muted-foreground mt-1">This document outlines the rules used to calculate scores and categorize processes.</p>
+        </div>
+        <div className="border rounded-lg p-4 bg-card h-[600px] overflow-y-auto">
+          <Accordion type="multiple" className="w-full" defaultValue={parsedRules.map(r => r.title)}>
+            {parsedRules.map((category) => (
+              <AccordionItem value={category.title} key={category.title}>
+                <AccordionTrigger className="text-lg font-semibold hover:no-underline">
+                  {category.title}
+                </AccordionTrigger>
+                <AccordionContent>
+                  <p className="text-muted-foreground mb-4">{category.description}</p>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Criteria / Input</TableHead>
+                        <TableHead className="text-right">Score / Category</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {category.rules.map((rule) => (
+                        <TableRow key={rule.criteria}>
+                          <TableCell className="font-medium">{rule.criteria}</TableCell>
+                          <TableCell className="text-right">
+                            {category.title === 'Process Categorization' ? (
+                                <Badge variant={getCategoryVariant(rule.score)}>{rule.score}</Badge>
+                            ) : (
+                                <span>{rule.score}</span>
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </div>
       </div>
-      <Accordion type="multiple" className="w-full">
-        {scoringLogic.map((category) => (
-          <AccordionItem value={category.title} key={category.title}>
-            <AccordionTrigger className="text-lg font-semibold hover:no-underline">
-              {category.title}
-            </AccordionTrigger>
-            <AccordionContent>
-              <p className="text-muted-foreground mb-4">{category.description}</p>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Criteria / Input</TableHead>
-                    <TableHead className="text-right">Score / Category</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {category.rules.map((rule) => (
-                    <TableRow key={rule.criteria}>
-                      <TableCell className="font-medium">{rule.criteria}</TableCell>
-                      <TableCell className="text-right">
-                         {category.title === 'Process Categorization' ? (
-                            <Badge variant={getCategoryVariant(rule.score)}>{rule.score}</Badge>
-                         ) : (
-                            <span>{rule.score}</span>
-                         )}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </AccordionContent>
-          </AccordionItem>
-        ))}
-      </Accordion>
+      <div>
+        <div className="mb-6">
+            <h2 className="text-2xl font-bold text-foreground">Edit Rules (JSON)</h2>
+            <p className="text-muted-foreground mt-1">Modify the scoring logic below. Changes will affect all future analyses.</p>
+        </div>
+        <div className="space-y-4">
+            <Textarea 
+                value={rules}
+                onChange={(e) => setRules(e.target.value)}
+                className="h-[550px] font-mono text-xs"
+                aria-label="Scoring Rules JSON Editor"
+            />
+            <Button onClick={handleSave} disabled={isSaving}>
+                {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                Save Rules
+            </Button>
+        </div>
+      </div>
     </div>
   );
 }

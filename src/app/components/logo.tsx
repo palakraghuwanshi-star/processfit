@@ -1,4 +1,3 @@
-
 import * as React from "react";
 
 export const Logo = (props: React.SVGProps<SVGSVGElement>) => (
@@ -9,22 +8,10 @@ export const Logo = (props: React.SVGProps<SVGSVGElement>) => (
     height="1em"
     {...props}
   >
-    <path fill="none" d="M0 0h256v256H0z" />
-    <path
-      fill="none"
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={16}
-      d="M168 40h48v48M88 216H40v-48"
-    />
-    <path
-      fill="none"
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={16}
-      d="M208.2 99.1a88 88 0 1 1-111.3-51.3"
-    />
+    <g fill="currentColor">
+      <path d="M208.2,99.1a88,88,0,1,1-111.3-51.3" />
+      <path d="M168,40h48V88" />
+      <path d="M88,216H40V168" />
+    </g>
   </svg>
 );

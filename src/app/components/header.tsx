@@ -16,9 +16,6 @@ export function Header() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-20">
         <Link href="/" className="flex items-center gap-3 font-bold text-xl">
           <Logo className="h-8 w-auto text-primary" />
-           <span className="font-semibold text-lg hidden sm:inline">
-            ProcessFit Analyser
-          </span>
         </Link>
 
         {!isAdminPath && (

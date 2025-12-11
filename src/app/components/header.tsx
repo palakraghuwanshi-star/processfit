@@ -15,8 +15,7 @@ export function Header() {
     <header className="w-full">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-20">
         <Link href="/" className="flex items-center gap-2 font-bold text-xl">
-          <Logo className="h-8 w-8 text-primary" />
-          <span className="hidden sm:inline">Pace's ProcessFit Analyser</span>
+          <Logo className="h-8 w-auto text-primary" />
         </Link>
 
         {!isAdminPath && (

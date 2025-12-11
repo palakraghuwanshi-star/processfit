@@ -1,3 +1,4 @@
+
 "use client";
 
 import {
@@ -18,7 +19,7 @@ const quadrantConfig = {
     "QUICK WINS ⭐": "bg-green-500/10 border-green-500/50 text-green-700 dark:text-green-400",
     "STRATEGIC LONG-TERM": "bg-blue-500/10 border-blue-500/50 text-blue-700 dark:text-blue-400",
     "INCREMENTAL GAINS": "bg-orange-500/10 border-orange-500/50 text-orange-700 dark:text-orange-400",
-    "AVOID/REVISIT": "bg-red-500/10 border-red-500/50 text-red-700 dark:text-red-400",
+    "REVISIT": "bg-red-500/10 border-red-500/50 text-red-700 dark:text-red-400",
 }
 
 export function PriorityMatrix({ businessImpact, feasibility }: PriorityMatrixProps) {
@@ -37,7 +38,7 @@ export function PriorityMatrix({ businessImpact, feasibility }: PriorityMatrixPr
             <div className="absolute inset-0 grid grid-cols-2 grid-rows-2 rounded-lg border">
                 <div className="flex items-center justify-center p-4 text-center text-sm font-semibold border-r border-b bg-blue-500/5 text-blue-900 dark:text-blue-200">Strategic Long-Term</div>
                 <div className="flex items-center justify-center p-4 text-center text-sm font-semibold border-b bg-green-500/5 text-green-900 dark:text-green-200">Quick Wins ⭐</div>
-                <div className="flex items-center justify-center p-4 text-center text-sm font-semibold border-r bg-red-500/5 text-red-900 dark:text-red-200">Avoid / Revisit</div>
+                <div className="flex items-center justify-center p-4 text-center text-sm font-semibold border-r bg-red-500/5 text-red-900 dark:text-red-200">Revisit</div>
                 <div className="flex items-center justify-center p-4 text-center text-sm font-semibold bg-orange-500/5 text-orange-900 dark:text-orange-200">Incremental Gains</div>
             </div>
 

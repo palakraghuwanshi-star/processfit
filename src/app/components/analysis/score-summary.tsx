@@ -1,3 +1,4 @@
+
 "use client";
 
 import type { AnalysisScores } from "@/app/lib/data-store";
@@ -6,7 +7,7 @@ const categoryInfo: Record<string, { priority: string; description: string }> = 
     "QUICK WIN ⭐": { priority: "Highest Priority", description: "High impact, high feasibility. These are prime candidates for automation." },
     "STRATEGIC LONG-TERM": { priority: "High Priority", description: "High impact, but lower feasibility. Requires strategic planning and investment." },
     "INCREMENTAL GAINS": { priority: "Medium Priority", description: "Lower impact, but high feasibility. Good for quick, smaller improvements." },
-    "AVOID/REVISIT": { priority: "Low Priority", description: "Low impact and low feasibility. Best to avoid or revisit after other priorities." },
+    "REVISIT": { priority: "Low Priority", description: "Low impact and low feasibility. Best to revisit after other priorities." },
 }
 
 interface ScoreSummaryProps {

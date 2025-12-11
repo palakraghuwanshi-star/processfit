@@ -233,7 +233,7 @@ export const calculateScores = (data: FormValues): { scores: AnalysisScores, fla
         category = "INCREMENTAL GAINS";
         color = "orange";
     } else {
-        category = "AVOID/REVISIT";
+        category = "REVISIT";
         color = "red";
     }
     

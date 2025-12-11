@@ -34,11 +34,44 @@ const getDb = () => {
     return firestore;
 }
 
+/**
+ * Recursively cleans an object by replacing `undefined` values with `null`.
+ * Firestore does not support `undefined`.
+ * @param obj The object to clean.
+ * @returns The cleaned object.
+ */
+const cleanDataForFirestore = (obj: any): any => {
+  if (obj === null || typeof obj !== 'object') {
+    return obj;
+  }
+
+  if (Array.isArray(obj)) {
+    return obj.map(item => cleanDataForFirestore(item));
+  }
+
+  const cleanedObj: { [key: string]: any } = {};
+  for (const key in obj) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
+      const value = obj[key];
+      cleanedObj[key] = value === undefined ? null : cleanDataForFirestore(value);
+    }
+  }
+  return cleanedObj;
+};
+
+
 export const saveAssessment = async (userId: string, id: string, data: Omit<AnalysisResult, 'id'>) => {
     const db = getDb();
     const docRef = doc(db, 'users', userId, 'assessments', id);
-    setDoc(docRef, {
+    
+    // Clean the data before sending it to Firestore
+    const cleanedData = {
         ...data,
+        formData: cleanDataForFirestore(data.formData),
+    };
+
+    setDoc(docRef, {
+        ...cleanedData,
         id, // ensure id is part of the document data
         submittedAt: serverTimestamp() // Use server-side timestamp
     }).catch((error) => {
@@ -130,3 +163,4 @@ export const getAllAssessments = async (): Promise<AnalysisResult[]> => {
         throw permissionError;
     }
 }
+

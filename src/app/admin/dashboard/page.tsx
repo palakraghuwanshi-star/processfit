@@ -89,8 +89,8 @@ export default function AdminDashboardPage() {
   return (
     <div className="min-h-screen w-full bg-background flex flex-col items-center justify-start pt-8 sm:pt-12 pb-16 px-4">
       <header className="w-full max-w-6xl flex items-center justify-between mb-10">
-        <div className="flex items-center gap-2 font-bold text-xl">
-            <Logo className="h-8 w-8 text-primary" />
+        <div className="flex items-center gap-3 font-bold text-xl">
+            <Logo className="h-8 w-auto text-primary" />
             <h1 className="font-headline text-3xl md:text-4xl font-semibold text-foreground">
                 Admin Dashboard
             </h1>

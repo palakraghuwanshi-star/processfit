@@ -3,12 +3,13 @@ import type { FormValues } from '@/app/lib/schema';
 import type { AnalysisScores } from '@/app/lib/data-store';
 import scoringRules from './scoring-rules.json';
 
-const scoreMonthlyVolume = (volume: number): number => {
-    if (volume < 100) return 0;
-    if (volume <= 500) return 2;
-    if (volume <= 1000) return 4;
-    if (volume <= 2500) return 6;
-    if (volume <= 5000) return 8;
+const scoreTotalMonthlyValue = (volume: number, cost: number): number => {
+    const totalValue = volume * cost;
+    if (totalValue < 500) return 1;
+    if (totalValue <= 1000) return 3;
+    if (totalValue <= 2500) return 5;
+    if (totalValue <= 5000) return 7;
+    if (totalValue <= 8500) return 9; // ~100k ARR
     return 10;
 };
 
@@ -43,15 +44,6 @@ const scoreProcessingTime = (time: string): number => {
         case "More than 15 days": return 10;
         default: return 0;
     }
-};
-
-const scoreCostPerTransaction = (cost: number): number => {
-    if (cost < 5) return 1;
-    if (cost <= 10) return 3;
-    if (cost <= 25) return 5;
-    if (cost <= 50) return 7;
-    if (cost <= 100) return 9;
-    return 10;
 };
 
 const scoreErrorRate = (rate: number): number => {
@@ -162,8 +154,8 @@ export const calculateScores = (data: FormValues): { scores: AnalysisScores, fla
 
     // The scoring functions still use hardcoded logic, but they could be replaced
     // with a dynamic rules engine that processes scoringRules.json
-    const volumeScale = scoreMonthlyVolume(data.monthlyVolume) + scoreProcessFrequency(data.processFrequency);
-    const costEfficiency = scoreTeamEffort(data.teamSize, data.timePercentage) + scoreProcessingTime(data.averageProcessingTime) + scoreCostPerTransaction(data.costPerTransaction);
+    const volumeScale = scoreProcessFrequency(data.processFrequency);
+    const costEfficiency = scoreTeamEffort(data.teamSize, data.timePercentage) + scoreProcessingTime(data.averageProcessingTime) + scoreTotalMonthlyValue(data.monthlyVolume, data.costPerTransaction);
     const riskCompliance = scoreErrorRate(data.errorRate) + scoreCompliance(data.complianceRequirements) + scoreDelayImpact(data.impactOfDelays);
     
     let stdScore = scoreStandardization(data.processStandardization);

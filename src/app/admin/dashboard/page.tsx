@@ -27,35 +27,44 @@ export default function AdminDashboardPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Redirect to login if user is not authenticated after loading.
     if (!isUserLoading && !user) {
       router.push('/admin/login');
+      return;
     }
-  }, [user, isUserLoading, router]);
 
-  useEffect(() => {
     if (user) {
-      const fetchAssessments = async () => {
+      const checkAdminAndFetchData = async () => {
         setIsLoading(true);
-        setError(null); // Clear previous errors
+        setError(null);
         try {
+          // Force a token refresh to get the latest custom claims.
           const idTokenResult = await user.getIdTokenResult(true);
+
+          // Check for the isAdmin claim directly.
           if (idTokenResult.claims.isAdmin) {
+            // If the user is an admin, fetch the assessment data.
             const data = await getAllAssessments();
             setAssessments(data);
           } else {
-            setError('You do not have permission to view this page.');
+            // If the claim is missing, deny access immediately.
+            setError(
+              'Access Denied: You do not have administrative privileges. Please contact your system administrator.'
+            );
           }
         } catch (e: any) {
-          // The error thrown from getAllAssessments will be more detailed
-          setError(e.message || 'Failed to fetch assessment data.');
+          // Catch errors from either getIdTokenResult or getAllAssessments.
+          // The error from getAllAssessments will be more detailed if it's a permission issue.
+          setError(e.message || 'An unexpected error occurred.');
         } finally {
           setIsLoading(false);
         }
       };
 
-      fetchAssessments();
+      checkAdminAndFetchData();
     }
-  }, [user]);
+  }, [user, isUserLoading, router]);
+
 
   if (isUserLoading || !user) {
     return (

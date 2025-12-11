@@ -44,6 +44,7 @@ service cloud.firestore {
 
     /**
      * Checks if the user has an 'isAdmin' custom claim set to true.
+     * This is the gatekeeper for all administrative actions.
      */
     function isAdmin() {
       return isSignedIn() && request.auth.token.isAdmin == true;
@@ -66,19 +67,18 @@ service cloud.firestore {
       return isOwner(userId) && resource != null;
     }
 
+
     // ------------------------------------------------------------------------
     // Collection Group Rules
     // ------------------------------------------------------------------------
 
     /**
      * @description Grants read-only access to the 'assessments' collection group
-     *              for administrative purposes.
+     *              for administrative purposes. This rule is critical for the
+     *              admin dashboard to fetch all assessments across all users.
      * @allow (get, list) An admin user can read any document from any user's
-     *                    'assessments' subcollection.
+     *                    'assessments' subcollection using a collection group query.
      * @deny (get, list) Any non-admin user trying to perform a collection group query.
-     * @principle Enables a global, admin-only view of all assessments without
-     *            compromising the user data silo model. This rule is essential
-     *            for the admin dashboard functionality.
      */
     match /{path=**}/assessments/{assessmentId} {
       allow get, list: if isAdmin();
@@ -90,39 +90,45 @@ service cloud.firestore {
     // ------------------------------------------------------------------------
 
     /**
-     * @description Controls access to a user's individual assessment documents.
-     * @path /users/{userId}/assessments/{assessmentId}
-     * @allow (get) An admin reading any assessment, or a user reading their own.
-     * @allow (create) An authenticated user creating an assessment under their own user ID path.
-     * @deny (get) User 'user456' trying to read an assessment from '/users/user123/assessments/abc'.
-     * @principle Restricts all access to the user's own data tree, enforcing a private data silo, except for admins.
+     * @description Controls access to a user's individual data, including their
+     *              assessments and related questionnaire responses.
+     * @path /users/{userId}
      */
-    match /users/{userId}/assessments/{assessmentId} {
-      allow get: if isOwner(userId) || isAdmin();
-      allow list: if isOwner(userId) || isAdmin();
-      allow create: if isOwner(userId)
-                      && request.resource.data.id == assessmentId;
-      allow update: if isExistingOwner(userId)
-                      && request.resource.data.id == resource.data.id;
-      allow delete: if isExistingOwner(userId);
+    match /users/{userId} {
 
       /**
-       * @description Controls access to the responses for a specific assessment.
-       * @path /users/{userId}/assessments/{assessmentId}/questionnaireResponses/{questionnaireResponseId}
-       * @allow (create) User 'user123' creating a response for their own assessment at '/users/user123/assessments/abc/...'.
-       * @deny (update) User 'user123' trying to update a response but with a different `assessmentId` in the body, which would break the parent link.
-       * @principle Enforces inherited ownership from the parent path and validates relational integrity between a response and its parent assessment.
+       * @description Controls access to a user's individual assessment documents.
+       * @path /users/{userId}/assessments/{assessmentId}
+       * @allow (get, list) An admin reading any assessment, or a user reading their own.
+       * @allow (create) An authenticated user creating an assessment under their own user ID path.
+       * @deny (get) User 'user456' trying to read an assessment from '/users/user123/assessments/abc'.
+       * @principle Restricts all access to the user's own data tree, enforcing a private data silo, with an exception for admin read access.
        */
-      match /questionnaireResponses/{questionnaireResponseId} {
-        allow get: if isOwner(userId) || isAdmin();
-        allow list: if isOwner(userId) || isAdmin();
+      match /assessments/{assessmentId} {
+        allow get, list: if isOwner(userId) || isAdmin();
         allow create: if isOwner(userId)
-                        && request.resource.data.id == questionnaireResponseId
-                        && request.resource.data.assessmentId == assessmentId;
+                        && request.resource.data.id == assessmentId;
         allow update: if isExistingOwner(userId)
-                        && request.resource.data.id == resource.data.id
-                        && request.resource.data.assessmentId == resource.data.assessmentId;
+                        && request.resource.data.id == resource.data.id;
         allow delete: if isExistingOwner(userId);
+
+        /**
+         * @description Controls access to the responses for a specific assessment.
+         * @path /users/{userId}/assessments/{assessmentId}/questionnaireResponses/{questionnaireResponseId}
+         * @allow (create) User 'user123' creating a response for their own assessment at '/users/user123/assessments/abc/...'.
+         * @deny (update) User 'user123' trying to update a response but with a different `assessmentId` in the body, which would break the parent link.
+         * @principle Enforces inherited ownership from the parent path and validates relational integrity between a response and its parent assessment.
+         */
+        match /questionnaireResponses/{questionnaireResponseId} {
+          allow get, list: if isOwner(userId) || isAdmin();
+          allow create: if isOwner(userId)
+                          && request.resource.data.id == questionnaireResponseId
+                          && request.resource.data.assessmentId == assessmentId;
+          allow update: if isExistingOwner(userId)
+                          && request.resource.data.id == resource.data.id
+                          && request.resource.data.assessmentId == resource.data.assessmentId;
+          allow delete: if isExistingOwner(userId);
+        }
       }
     }
   }

@@ -108,6 +108,9 @@ function FormSectionHeader({ title }: { title: string }) {
 
 export function QuestionnaireForm() {
   const [currentStep, setCurrentStep] = React.useState(0);
+  const [completedSteps, setCompletedSteps] = React.useState<boolean[]>(
+    Array(formSections.length).fill(false)
+  );
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const { toast } = useToast();
   const router = useRouter();
@@ -161,8 +164,21 @@ export function QuestionnaireForm() {
     }
   };
 
-  const nextStep = () => {
-    setCurrentStep(prev => prev + 1);
+  const nextStep = async () => {
+    const currentSectionFields = formSections[currentStep].fields;
+    const isValid = await form.trigger(currentSectionFields as FieldName[]);
+    
+    setCompletedSteps(prev => {
+        const newCompleted = [...prev];
+        if (isValid) {
+            newCompleted[currentStep] = true;
+        }
+        return newCompleted;
+    });
+
+    if (currentStep < formSections.length - 1) {
+        setCurrentStep(prev => prev + 1);
+    }
   };
 
   const prevStep = () => {
@@ -233,7 +249,12 @@ export function QuestionnaireForm() {
     <FormProvider {...form}>
       <div className="w-full max-w-5xl mx-auto">
         <div className="mb-12">
-            <MultiStepProgressBar sections={formSections} currentStep={currentStep} onStepClick={goToStep} />
+            <MultiStepProgressBar 
+                sections={formSections} 
+                currentStep={currentStep} 
+                completedSteps={completedSteps}
+                onStepClick={goToStep} 
+            />
         </div>
 
         <form onSubmit={form.handleSubmit(onSubmit, onValidationErrors)} className="space-y-8 mt-12">

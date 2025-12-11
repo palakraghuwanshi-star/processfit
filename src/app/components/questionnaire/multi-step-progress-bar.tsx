@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as React from 'react';
@@ -12,14 +13,15 @@ interface Step {
 interface MultiStepProgressBarProps {
   sections: readonly Step[];
   currentStep: number;
+  completedSteps: boolean[];
   onStepClick: (step: number) => void;
 }
 
-export function MultiStepProgressBar({ sections, currentStep, onStepClick }: MultiStepProgressBarProps) {
+export function MultiStepProgressBar({ sections, currentStep, completedSteps, onStepClick }: MultiStepProgressBarProps) {
   return (
     <div className="flex items-center justify-center">
       {sections.map((section, index) => {
-        const isCompleted = index < currentStep;
+        const isCompleted = completedSteps[index];
         const isActive = index === currentStep;
 
         return (

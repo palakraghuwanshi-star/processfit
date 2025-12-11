@@ -17,7 +17,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { getAllAssessments, type AnalysisResult } from '@/app/lib/data-store';
 import { format } from 'date-fns';
-import { Logo } from '@/app/components/logo';
+import { Header } from '@/app/components/header';
 
 export default function AdminDashboardPage() {
   const { user, isUserLoading } = useUser();
@@ -87,17 +87,16 @@ export default function AdminDashboardPage() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-background flex flex-col items-center justify-start pt-8 sm:pt-12 pb-16 px-4">
-      <header className="w-full max-w-6xl flex items-center justify-between mb-10">
-        <div className="flex items-center gap-3 font-bold text-xl">
-            <Logo className="h-8 w-auto text-primary" />
-            <h1 className="font-headline text-3xl md:text-4xl font-semibold text-foreground">
+    <div className="min-h-screen w-full bg-background flex flex-col items-center justify-start pb-16">
+      <Header />
+      <main className="w-full max-w-6xl px-4 mt-10">
+        <div className="flex items-center justify-between mb-10">
+            <h1 className="font-bold text-3xl md:text-4xl text-foreground">
                 Admin Dashboard
             </h1>
+            <Button onClick={handleSignOut}>Sign Out</Button>
         </div>
-        <Button onClick={handleSignOut}>Sign Out</Button>
-      </header>
-      <main className="w-full max-w-6xl">
+        
         {isLoading ? (
           <div className="flex w-full items-center justify-center py-20">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />

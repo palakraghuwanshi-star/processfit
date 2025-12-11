@@ -6,10 +6,13 @@ import { Button } from "@/components/ui/button";
 import { LogIn } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { Logo } from "./logo";
+import { useUser } from "@/firebase";
 
 export function Header() {
   const pathname = usePathname();
+  const { user } = useUser();
   const isAdminPath = pathname.startsWith("/admin");
+  const isLoginPage = pathname === '/admin/login';
 
   return (
     <header className="w-full border-b">
@@ -25,6 +28,10 @@ export function Header() {
               Admin Login
             </Link>
           </Button>
+        )}
+        {isAdminPath && user && !isLoginPage && (
+          // This will be shown on dashboard, but not login
+          <div></div> 
         )}
       </div>
     </header>

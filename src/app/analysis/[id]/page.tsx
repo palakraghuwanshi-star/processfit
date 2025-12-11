@@ -10,6 +10,7 @@ import { ScoreSummary } from "@/app/components/analysis/score-summary";
 import { ScoreBreakdown } from "@/app/components/analysis/score-breakdown";
 import { PriorityMatrix } from "@/app/components/analysis/priority-matrix";
 import { KeyInsights } from "@/app/components/analysis/key-insights";
+import { FullResponses } from "@/app/components/analysis/full-responses";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
@@ -21,6 +22,7 @@ export default function AnalysisPage() {
   const [data, setData] = useState<AnalysisResult | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     if (isUserLoading) {
@@ -43,6 +45,9 @@ export default function AnalysisPage() {
 
     const fetchData = async () => {
       try {
+        const idTokenResult = await user.getIdTokenResult();
+        setIsAdmin(!!idTokenResult.claims.isAdmin);
+        
         const assessmentData = await getAssessment(user.uid, analysisId);
         if (assessmentData) {
           setData(assessmentData);
@@ -104,9 +109,9 @@ export default function AnalysisPage() {
                     </p>
                 </div>
                 <Button asChild variant="outline">
-                    <Link href="/">
+                    <Link href={isAdmin ? "/admin/dashboard" : "/"}>
                         <ArrowLeft className="mr-2 h-4 w-4" />
-                        New Analysis
+                        {isAdmin ? "Back to Dashboard" : "New Analysis"}
                     </Link>
                 </Button>
             </div>
@@ -114,13 +119,9 @@ export default function AnalysisPage() {
 
         <main className="p-6 sm:p-8 space-y-12">
             <ScoreSummary scores={data.scores} totalScore={150} />
-
             <Separator />
-            
             <PriorityMatrix businessImpact={data.scores.businessImpact} feasibility={data.scores.feasibility} />
-
             <Separator />
-
             <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
                 <div className="md:col-span-3">
                     <ScoreBreakdown scores={data.scores} />
@@ -129,6 +130,12 @@ export default function AnalysisPage() {
                      <KeyInsights flags={data.flags} formData={data.formData} />
                 </div>
             </div>
+            {isAdmin && (
+                <>
+                    <Separator />
+                    <FullResponses formData={data.formData} />
+                </>
+            )}
         </main>
       </div>
     </div>

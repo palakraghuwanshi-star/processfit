@@ -29,8 +29,8 @@ import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
 import { SystemsInput } from './systems-input';
+import { MultiStepProgressBar } from './multi-step-progress-bar';
 
 import {
   FormControl,
@@ -214,69 +214,64 @@ export function QuestionnaireForm() {
   };
 
   const isPending = isSubmitting || isUserLoading;
-  const progressValue = ((currentStep + 1) / formSections.length) * 100;
 
   return (
     <FormProvider {...form}>
-      <div className="mb-12 text-center">
-        <h2 className="text-lg font-medium text-primary">
-            Section {currentStep + 1} of {formSections.length}
-        </h2>
-        <p className="text-2xl font-bold text-foreground mt-1">
-            {formSections[currentStep].title}
-        </p>
-        <Progress value={progressValue} className="w-full max-w-md mx-auto mt-4" />
-      </div>
+      <div className="w-full max-w-5xl mx-auto">
+        <div className="mb-12">
+            <MultiStepProgressBar sections={formSections} currentStep={currentStep} />
+        </div>
 
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 mt-12">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={currentStep}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.2 }}
-          >
-            {currentStep === 0 && <Section1 />}
-            {currentStep === 1 && <Section2 />}
-            {currentStep === 2 && <Section3 />}
-            {currentStep === 3 && <Section4 />}
-            {currentStep === 4 && <Section5 />}
-            {currentStep === 5 && <Section6 />}
-            {currentStep === 6 && <Section7 />}
-          </motion.div>
-        </AnimatePresence>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 mt-12">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentStep}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.2 }}
+            >
+              {currentStep === 0 && <Section1 />}
+              {currentStep === 1 && <Section2 />}
+              {currentStep === 2 && <Section3 />}
+              {currentStep === 3 && <Section4 />}
+              {currentStep === 4 && <Section5 />}
+              {currentStep === 5 && <Section6 />}
+              {currentStep === 6 && <Section7 />}
+            </motion.div>
+          </AnimatePresence>
 
-        <div className="flex justify-between items-center pt-8 mt-12">
-          <div>
-            {currentStep > 0 && (
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={prevStep}
-                disabled={isPending}
-                className="text-muted-foreground"
-              >
-                <ArrowLeft className="mr-2 h-4 w-4" /> Previous
+          <div className="flex justify-between items-center pt-8 mt-12 border-t">
+            <div>
+              {currentStep > 0 && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={prevStep}
+                  disabled={isPending}
+                  className="text-muted-foreground"
+                >
+                  <ArrowLeft className="mr-2 h-4 w-4" /> Previous
+                </Button>
+              )}
+            </div>
+
+            {currentStep < formSections.length - 1 ? (
+              <Button type="button" onClick={nextStep} disabled={isPending}>
+                Next <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            ) : (
+              <Button type="submit" disabled={isPending}>
+                {isPending ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  'Submit for Analysis'
+                )}
               </Button>
             )}
           </div>
-
-          {currentStep < formSections.length - 1 ? (
-            <Button type="button" onClick={nextStep} disabled={isPending}>
-              Next <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          ) : (
-            <Button type="submit" disabled={isPending}>
-              {isPending ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                'Submit for Analysis'
-              )}
-            </Button>
-          )}
-        </div>
-      </form>
+        </form>
+      </div>
     </FormProvider>
   );
 }
@@ -920,7 +915,7 @@ const Section7 = () => (
             <FormLabel>How often do you receive complaints about this process?</FormLabel>
             <FormControl>
               <RadioGroup
-                onValue-change={field.onChange}
+                onValueChange={field.onChange}
                 defaultValue={field.value}
                 className="space-y-2 pt-1"
               >

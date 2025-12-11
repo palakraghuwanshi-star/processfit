@@ -27,42 +27,39 @@ export default function AdminDashboardPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Redirect to login if user is not authenticated after loading.
-    if (!isUserLoading && !user) {
+    if (isUserLoading) {
+      // Still waiting for auth state to be determined, do nothing yet.
+      return;
+    }
+    if (!user) {
+      // If auth state is resolved and there's no user, redirect.
       router.push('/admin/login');
       return;
     }
 
-    if (user) {
-      const checkAdminAndFetchData = async () => {
-        setIsLoading(true);
-        setError(null);
-        try {
-          // Force a token refresh to get the latest custom claims.
-          const idTokenResult = await user.getIdTokenResult(true);
-
-          // Check for the isAdmin claim directly.
-          if (idTokenResult.claims.isAdmin) {
-            // If the user is an admin, fetch the assessment data.
-            const data = await getAllAssessments();
-            setAssessments(data);
-          } else {
-            // If the claim is missing, deny access immediately.
-            setError(
-              'Access Denied: You do not have administrative privileges. Please contact your system administrator.'
-            );
-          }
-        } catch (e: any) {
-          // Catch errors from either getIdTokenResult or getAllAssessments.
-          // The error from getAllAssessments will be more detailed if it's a permission issue.
-          setError(e.message || 'An unexpected error occurred.');
-        } finally {
-          setIsLoading(false);
+    const fetchAssessments = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const idTokenResult = await user.getIdTokenResult(true); // Force refresh
+        if (idTokenResult.claims.isAdmin) {
+          const data = await getAllAssessments();
+          setAssessments(data);
+        } else {
+          setError(
+            'Access Denied: You do not have administrative privileges. Please contact your system administrator.'
+          );
         }
-      };
+      } catch (e: any) {
+        console.error('Error fetching assessments:', e);
+        // Use the detailed error message from FirestorePermissionError if available
+        setError(e.message || 'Failed to fetch assessment data. You may not have the required permissions.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-      checkAdminAndFetchData();
-    }
+    fetchAssessments();
   }, [user, isUserLoading, router]);
 
 
@@ -135,7 +132,7 @@ export default function AdminDashboardPage() {
                     <TableRow key={assessment.id}>
                       <TableCell className="font-medium">{assessment.formData.processName}</TableCell>
                       <TableCell>
-                        {assessment.submittedAt ? format(new Date(assessment.submittedAt.seconds * 1000), 'MMM d, yyyy') : 'N/A'}
+                        {assessment.submittedAt ? format(new Date(assessment.submittedAt), 'MMM d, yyyy') : 'N/A'}
                       </TableCell>
                       <TableCell>{assessment.scores.totalScore}</TableCell>
                       <TableCell>

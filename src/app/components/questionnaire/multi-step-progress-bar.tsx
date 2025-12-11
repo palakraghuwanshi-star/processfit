@@ -13,18 +13,28 @@ interface Step {
 interface MultiStepProgressBarProps {
   sections: readonly Step[];
   currentStep: number;
+  onStepClick: (step: number) => void;
 }
 
-export function MultiStepProgressBar({ sections, currentStep }: MultiStepProgressBarProps) {
+export function MultiStepProgressBar({ sections, currentStep, onStepClick }: MultiStepProgressBarProps) {
   return (
     <div className="flex items-center justify-center">
       {sections.map((section, index) => {
         const isCompleted = index < currentStep;
         const isActive = index === currentStep;
+        const isClickable = index <= currentStep;
 
         return (
           <React.Fragment key={section.title}>
-            <div className="flex flex-col items-center">
+            <button
+              type="button"
+              onClick={() => isClickable && onStepClick(index)}
+              disabled={!isClickable}
+              className={cn(
+                'flex flex-col items-center text-center focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md p-2',
+                isClickable ? 'cursor-pointer' : 'cursor-not-allowed'
+              )}
+            >
               <div
                 className={cn(
                   'flex h-10 w-10 items-center justify-center rounded-full border-2 transition-all',
@@ -51,7 +61,7 @@ export function MultiStepProgressBar({ sections, currentStep }: MultiStepProgres
               >
                 {section.title}
               </p>
-            </div>
+            </button>
             {index < sections.length - 1 && (
               <div
                 className={cn(

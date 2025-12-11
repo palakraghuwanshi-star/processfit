@@ -155,6 +155,12 @@ export function QuestionnaireForm() {
     },
   });
 
+  const goToStep = (step: number) => {
+    if (step >= 0 && step < formSections.length) {
+      setCurrentStep(step);
+    }
+  };
+
   const nextStep = async () => {
     const fieldsToValidate = formSections[currentStep].fields as FieldName[];
     const isValid = await form.trigger(fieldsToValidate);
@@ -219,7 +225,7 @@ export function QuestionnaireForm() {
     <FormProvider {...form}>
       <div className="w-full max-w-5xl mx-auto">
         <div className="mb-12">
-            <MultiStepProgressBar sections={formSections} currentStep={currentStep} />
+            <MultiStepProgressBar sections={formSections} currentStep={currentStep} onStepClick={goToStep} />
         </div>
 
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 mt-12">

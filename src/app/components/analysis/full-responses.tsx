@@ -66,6 +66,37 @@ const questionMap: Record<keyof FormValues, string> = {
     expectedROI: "Based on expected savings, when do you estimate payback?",
 };
 
+// Defines the order of questions to match the form
+const orderedFields: (keyof FormValues)[] = [
+    'organizationName',
+    'yourName',
+    'processName',
+    'industry',
+    'processDescription',
+    'monthlyVolume',
+    'processFrequency',
+    'teamSize',
+    'timePercentage',
+    'averageProcessingTime',
+    'costPerTransaction',
+    'currentChallenges',
+    'impactOfDelays',
+    'biggestPainPoint',
+    'errorRate',
+    'complianceRequirements',
+    'documentationStatus',
+    'documentationPercentage',
+    'reliesOnTribalKnowledge',
+    'processStandardization',
+    'exceptionHandling',
+    'systems',
+    'systemAccess',
+    'processBottleneck',
+    'stakeholderComplaints',
+    'growthLimitation',
+    'expectedROI',
+];
+
 export function FullResponses({ formData }: FullResponsesProps) {
   return (
     <section>
@@ -73,8 +104,18 @@ export function FullResponses({ formData }: FullResponsesProps) {
       <p className="text-muted-foreground mt-1">A detailed view of all submitted answers.</p>
       <div className="mt-6 border rounded-lg p-2 md:p-4">
         <Accordion type="multiple" className="w-full">
-            {Object.entries(formData).map(([key, value]) => {
+            {orderedFields.map((key) => {
+                const value = formData[key];
                 const question = questionMap[key as keyof FormValues];
+
+                // Don't render items that were never answered or are optional and empty
+                if (value === undefined || value === null || (Array.isArray(value) && value.length === 0)) {
+                    // But still render for fields that are conditionally rendered but were not required.
+                     if (key !== 'documentationPercentage' && key !== 'reliesOnTribalKnowledge' && key !== 'impactOfDelays') {
+                        return null;
+                     }
+                }
+
                 if (!question) return null;
 
                 // Special rendering for the 'systems' array
@@ -83,24 +124,30 @@ export function FullResponses({ formData }: FullResponsesProps) {
                         <AccordionItem value={key} key={key}>
                             <AccordionTrigger className="text-left hover:no-underline font-semibold">{question}</AccordionTrigger>
                             <AccordionContent>
-                                <Table>
-                                    <TableHeader>
-                                        <TableRow>
-                                            <TableHead>System Name</TableHead>
-                                            <TableHead>Has APIs?</TableHead>
-                                            <TableHead>Cloud-based?</TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {value.map((system, index) => (
-                                            <TableRow key={index}>
-                                                <TableCell>{system.name || 'N/A'}</TableCell>
-                                                <TableCell>{system.hasApi || 'N/A'}</TableCell>
-                                                <TableCell>{system.isCloud ?? 'N/A'}</TableCell>
+                                {value.length > 0 ? (
+                                    <Table>
+                                        <TableHeader>
+                                            <TableRow>
+                                                <TableHead>System Name</TableHead>
+                                                <TableHead>Has APIs?</TableHead>
+                                                <TableHead>Cloud-based?</TableHead>
                                             </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
+                                        </TableHeader>
+                                        <TableBody>
+                                            {value.map((system, index) => (
+                                                <TableRow key={index}>
+                                                    <TableCell>{system.name || 'N/A'}</TableCell>
+                                                    <TableCell>{system.hasApi || 'N/A'}</TableCell>
+                                                    <TableCell>{system.isCloud ?? 'N/A'}</TableCell>
+                                                </TableRow>
+                                            ))}
+                                        </TableBody>
+                                    </Table>
+                                ) : (
+                                    <div className="p-4 bg-muted/50 rounded-md text-sm">
+                                        <span className="text-muted-foreground italic">Not answered</span>
+                                    </div>
+                                )}
                             </AccordionContent>
                         </AccordionItem>
                     )

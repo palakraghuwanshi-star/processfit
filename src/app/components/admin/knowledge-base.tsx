@@ -23,9 +23,10 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { Label } from "@/components/ui/label";
 
-// In a real app, you'd fetch this from and save to a backend.
-// For this example, we'll simulate it with local state and `require`.
+// We `require` it to get the initial state, ensuring it's fresh on server render.
+// The `useEffect` with a dynamic `import()` ensures we can get updated content on the client.
 import initialRules from '@/app/lib/scoring-rules.json';
+import { updateKnowledgeBase } from "@/ai/flows/update-knowledge-base";
 
 
 type Rule = {
@@ -56,31 +57,31 @@ export function KnowledgeBase() {
       const parsed = JSON.parse(rules);
       setParsedData(parsed);
     } catch (e) {
-      // Ignore parse errors while typing
+      // Ignore parse errors while typing, the UI will just not update
     }
   }, [rules]);
 
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      // In a real app, this would be an API call to a backend endpoint
-      // that has permission to write to the filesystem.
-      // For demonstration, we're just simulating a delay.
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Here you would have a server-side function to write the file.
-      // Since we can't do that from the client, we'll log it.
-      console.log("Saving rules to backend:", rules);
-      
-      toast({
-        title: "Knowledge Base Saved",
-        description: "Your changes have been saved. They will be applied to the next analysis.",
-      });
-    } catch (error) {
+      // Validate JSON before saving
+      JSON.parse(rules);
+
+      const result = await updateKnowledgeBase({ content: rules });
+
+      if (result.success) {
+        toast({
+          title: "Knowledge Base Saved",
+          description: "Your changes have been saved and will be applied to the next analysis.",
+        });
+      } else {
+        throw new Error(result.error || "Failed to save knowledge base.");
+      }
+    } catch (error: any) {
       toast({
         variant: "destructive",
         title: "Error Saving",
-        description: "Could not save the knowledge base. Please try again.",
+        description: error.message.includes('JSON') ? "The content is not valid JSON. Please correct it." : error.message,
       });
     } finally {
       setIsSaving(false);

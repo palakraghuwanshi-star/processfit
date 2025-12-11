@@ -17,7 +17,7 @@ export function Header() {
         <Link href="/" className="flex items-center gap-3 font-bold text-xl">
           <Logo className="h-8 w-auto text-primary" />
            <span className="font-semibold text-lg hidden sm:inline">
-            Pace's ProcessFit Analyser
+            ProcessFit Analyser
           </span>
         </Link>
 

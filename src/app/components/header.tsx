@@ -12,10 +12,13 @@ export function Header() {
   const isAdminPath = pathname.startsWith("/admin");
 
   return (
-    <header className="w-full">
+    <header className="w-full border-b">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-20">
-        <Link href="/" className="flex items-center gap-2 font-bold text-xl">
+        <Link href="/" className="flex items-center gap-3 font-bold text-xl">
           <Logo className="h-8 w-auto text-primary" />
+           <span className="font-semibold text-lg hidden sm:inline">
+            Pace's ProcessFit Analyser
+          </span>
         </Link>
 
         {!isAdminPath && (

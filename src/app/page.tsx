@@ -9,12 +9,12 @@ export default function Home() {
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
       <main className="flex-1 flex flex-col items-center justify-center text-center px-4 sm:px-6 lg:px-8">
-        <div className="max-w-2xl">
+        <div className="max-w-3xl">
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-foreground tracking-tight">
             Discover Your Automation Potential with{" "}
             <span className="text-primary">ProcessFit Analyser</span>
           </h1>
-          <p className="mt-6 text-lg sm:text-xl text-muted-foreground max-w-xl mx-auto">
+          <p className="mt-6 text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
             Uncover inefficiencies and quantify the automation readiness of any
             business process. Get an instant, data-driven analysis to guide
             your digital transformation journey.

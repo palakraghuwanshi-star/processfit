@@ -4,7 +4,7 @@
 import { useEffect, useState } from "react";
 import { notFound, useParams } from "next/navigation";
 import { useUser } from "@/firebase";
-import { getAssessment, updateAssessmentWithAiData, type AnalysisResult } from "@/app/lib/data-store";
+import { getAssessment, type AnalysisResult } from "@/app/lib/data-store";
 import { ScoreSummary } from "@/app/components/analysis/score-summary";
 import { ScoreBreakdown } from "@/app/components/analysis/score-breakdown";
 import { PriorityMatrix } from "@/app/components/analysis/priority-matrix";
@@ -86,7 +86,7 @@ export default function AnalysisPage() {
                   scores: assessmentData.scores
               });
               setAiAnalysis(analysis);
-              // Save it back to DB - non-blocking
+              // This is a non-blocking call to save the analysis back to the DB
               updateAssessmentWithAiData(user.uid, analysisId, analysis);
               setIsAiLoading(false);
           }

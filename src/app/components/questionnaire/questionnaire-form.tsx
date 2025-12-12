@@ -16,7 +16,6 @@ import {
   ArrowLeft,
   ArrowRight,
   Info,
-  Puzzle,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
@@ -27,7 +26,6 @@ import { saveAssessment } from '@/app/lib/data-store';
 import { formSchema, type FormValues } from '@/app/lib/schema';
 import { calculateScores } from '@/app/lib/scoring';
 import { useToast } from '@/hooks/use-toast';
-import { cn } from '@/lib/utils';
 
 import { Button } from '@/components/ui/button';
 import { SystemsInput } from './systems-input';
@@ -59,7 +57,10 @@ const formSections = [
   {
     title: 'Process Details',
     icon: FileText,
-    fields: ['organizationName', 'yourName', 'processName', 'industry', 'processDescription'],
+    fields: [
+        'organizationName', 'yourName', 'processName', 'industry', 'processDescription',
+        'documentProcessing', 'crossSystemValidation', 'decisionComplexity', 'communicationNeeds', 'humanInLoop'
+    ],
   },
   {
     title: 'Volume & Scale',
@@ -99,11 +100,6 @@ const formSections = [
     icon: TrendingUp,
     fields: ['processBottleneck', 'stakeholderComplaints', 'growthLimitation', 'expectedROI'],
   },
-  {
-    title: 'Task Complexity',
-    icon: Puzzle,
-    fields: ['documentProcessing', 'crossSystemValidation', 'decisionComplexity', 'communicationNeeds', 'humanInLoop'],
-  }
 ] as const;
 
 type FieldName = (typeof formSections)[number]['fields'][number];
@@ -285,7 +281,6 @@ export function QuestionnaireForm() {
               {currentStep === 4 && <Section5 />}
               {currentStep === 5 && <Section6 />}
               {currentStep === 6 && <Section7 />}
-              {currentStep === 7 && <Section8 />}
             </motion.div>
           </AnimatePresence>
 
@@ -328,96 +323,222 @@ export function QuestionnaireForm() {
 const Section1 = () => (
   <div>
     <FormSectionHeader title="Process Details" />
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <FormField
-          name="organizationName"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>What is your organization name?</FormLabel>
-              <FormControl>
-                <Input placeholder="e.g., Acme Corporation" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          name="yourName"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>What is your name?</FormLabel>
-              <FormControl>
-                <Input placeholder="e.g., John Smith" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <FormField
-          name="processName"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>What is the name of the process you want to automate?</FormLabel>
-              <FormControl>
-                <Input placeholder="e.g., Purchase Requisition to Purchase Order" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          name="industry"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>What industry is your organization in?</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+    <div className="space-y-8">
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <FormField
+            name="organizationName"
+            render={({ field }) => (
+                <FormItem>
+                <FormLabel>What is your organization name?</FormLabel>
                 <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select an industry" />
-                  </SelectTrigger>
+                    <Input placeholder="e.g., Acme Corporation" {...field} />
                 </FormControl>
-                <SelectContent>
-                  {Options.industryOptions.map(o => (
-                    <SelectItem key={o} value={o}>
-                      {o}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      </div>
-      <FormField
-        name="processDescription"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>
-              Please describe this process, including the main steps and systems involved
-            </FormLabel>
-            <FormControl>
-              <Textarea
-                placeholder="Describe the workflow step-by-step and mention which systems are used in each step. For example:
+                <FormMessage />
+                </FormItem>
+            )}
+            />
+            <FormField
+            name="yourName"
+            render={({ field }) => (
+                <FormItem>
+                <FormLabel>What is your name?</FormLabel>
+                <FormControl>
+                    <Input placeholder="e.g., John Smith" {...field} />
+                </FormControl>
+                <FormMessage />
+                </FormItem>
+            )}
+            />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <FormField
+            name="processName"
+            render={({ field }) => (
+                <FormItem>
+                <FormLabel>What is the name of the process you want to automate?</FormLabel>
+                <FormControl>
+                    <Input placeholder="e.g., Purchase Requisition to Purchase Order" {...field} />
+                </FormControl>
+                <FormMessage />
+                </FormItem>
+            )}
+            />
+            <FormField
+            name="industry"
+            render={({ field }) => (
+                <FormItem>
+                <FormLabel>What industry is your organization in?</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                    <SelectTrigger>
+                        <SelectValue placeholder="Select an industry" />
+                    </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                    {Options.industryOptions.map(o => (
+                        <SelectItem key={o} value={o}>
+                        {o}
+                        </SelectItem>
+                    ))}
+                    </SelectContent>
+                </Select>
+                <FormMessage />
+                </FormItem>
+            )}
+            />
+        </div>
+        <FormField
+            name="processDescription"
+            render={({ field }) => (
+            <FormItem>
+                <FormLabel>
+                Please describe this process, including the main steps and systems involved
+                </FormLabel>
+                <FormControl>
+                <Textarea
+                    placeholder="Describe the workflow step-by-step and mention which systems are used in each step. For example:
 1. Requester submits PR in SAP
 2. Manager approves in email
 3. Procurement team creates PO in Coupa
 4. PO sent to vendor via email..."
-                {...field}
-                rows={5}
-              />
-            </FormControl>
-            <FormDescription className="flex items-center gap-1.5">
-              <Info className="h-3 w-3" />
-              Include as much detail as possible - this helps us understand your process better
-            </FormDescription>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
+                    {...field}
+                    rows={5}
+                />
+                </FormControl>
+                <FormDescription className="flex items-center gap-1.5">
+                <Info className="h-3 w-3" />
+                Include as much detail as possible - this helps us understand your process better
+                </FormDescription>
+                <FormMessage />
+            </FormItem>
+            )}
+        />
+      </div>
+      <div className="space-y-6 pt-8 border-t">
+        <h3 className="text-lg font-medium text-foreground">Task Complexity</h3>
+        <p className="text-sm text-muted-foreground">Help us understand the specific types of tasks involved in this process.</p>
+        <div className="space-y-6 max-w-lg">
+            <FormField
+                name="documentProcessing"
+                render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Does this process involve processing documents (invoices, contracts, forms, receipts, etc.)?</FormLabel>
+                        <FormControl>
+                            <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="space-y-2 pt-1">
+                                {Options.documentProcessingOptions.map(o => (
+                                    <FormItem key={o} className="flex items-center space-x-3 space-y-0">
+                                        <FormControl><RadioGroupItem value={o} /></FormControl>
+                                        <FormLabel className="font-normal">{o}</FormLabel>
+                                    </FormItem>
+                                ))}
+                            </RadioGroup>
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
+            <FormField
+                name="crossSystemValidation"
+                render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Does this process require validating or matching data across multiple systems?</FormLabel>
+                        <FormControl>
+                            <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="space-y-2 pt-1">
+                                {Options.crossSystemValidationOptions.map(o => (
+                                    <FormItem key={o} className="flex items-center space-x-3 space-y-0">
+                                        <FormControl><RadioGroupItem value={o} /></FormControl>
+                                        <FormLabel className="font-normal">{o}</FormLabel>
+                                    </FormItem>
+                                ))}
+                            </RadioGroup>
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
+            <FormField
+                name="decisionComplexity"
+                render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>What level of decision-making is required in this process?</FormLabel>
+                        <FormControl>
+                            <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="space-y-2 pt-1">
+                                {Options.decisionComplexityOptions.map(o => (
+                                    <FormItem key={o} className="flex items-center space-x-3 space-y-0">
+                                        <FormControl><RadioGroupItem value={o} /></FormControl>
+                                        <FormLabel className="font-normal">{o}</FormLabel>
+                                    </FormItem>
+                                ))}
+                            </RadioGroup>
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
+             <FormField
+                name="communicationNeeds"
+                render={() => (
+                    <FormItem>
+                        <FormLabel>What types of communication does this process require?</FormLabel>
+                        <FormDescription>Select all that apply.</FormDescription>
+                        <div className="space-y-2 pt-2">
+                            {Options.communicationOptions.map(item => (
+                                <FormField
+                                    key={item}
+                                    name="communicationNeeds"
+                                    render={({ field }) => (
+                                    <FormItem key={item} className="flex flex-row items-start space-x-3 space-y-0">
+                                        <FormControl>
+                                            <Checkbox
+                                                checked={field.value?.includes(item)}
+                                                onCheckedChange={checked => {
+                                                    let updatedValue = [...(field.value || [])];
+                                                    if (item === "None of the above") {
+                                                        updatedValue = checked ? ["None of the above"] : [];
+                                                    } else {
+                                                        updatedValue = updatedValue.filter(v => v !== "None of the above");
+                                                        if (checked) {
+                                                            updatedValue.push(item);
+                                                        } else {
+                                                            updatedValue = updatedValue.filter(value => value !== item);
+                                                        }
+                                                    }
+                                                    field.onChange(updatedValue);
+                                                }}
+                                            />
+                                        </FormControl>
+                                        <FormLabel className="font-normal">{item}</FormLabel>
+                                    </FormItem>
+                                    )}
+                                />
+                            ))}
+                        </div>
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
+            <FormField
+                name="humanInLoop"
+                render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>How often does this process need human review or approval?</FormLabel>
+                        <FormControl>
+                            <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="space-y-2 pt-1">
+                                {Options.humanInLoopOptions.map(o => (
+                                    <FormItem key={o} className="flex items-center space-x-3 space-y-0">
+                                        <FormControl><RadioGroupItem value={o} /></FormControl>
+                                        <FormLabel className="font-normal">{o}</FormLabel>
+                                    </FormItem>
+                                ))}
+                            </RadioGroup>
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
+        </div>
+      </div>
     </div>
   </div>
 );
@@ -1035,128 +1156,4 @@ const Section7 = () => (
   </div>
 );
 
-const Section8 = () => (
-    <div>
-        <FormSectionHeader title="Task Complexity" />
-        <div className="space-y-6 max-w-lg">
-            <FormField
-                name="documentProcessing"
-                render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>Does this process involve processing documents (invoices, contracts, forms, receipts, etc.)?</FormLabel>
-                        <FormControl>
-                            <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="space-y-2 pt-1">
-                                {Options.documentProcessingOptions.map(o => (
-                                    <FormItem key={o} className="flex items-center space-x-3 space-y-0">
-                                        <FormControl><RadioGroupItem value={o} /></FormControl>
-                                        <FormLabel className="font-normal">{o}</FormLabel>
-                                    </FormItem>
-                                ))}
-                            </RadioGroup>
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                )}
-            />
-            <FormField
-                name="crossSystemValidation"
-                render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>Does this process require validating or matching data across multiple systems?</FormLabel>
-                        <FormControl>
-                            <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="space-y-2 pt-1">
-                                {Options.crossSystemValidationOptions.map(o => (
-                                    <FormItem key={o} className="flex items-center space-x-3 space-y-0">
-                                        <FormControl><RadioGroupItem value={o} /></FormControl>
-                                        <FormLabel className="font-normal">{o}</FormLabel>
-                                    </FormItem>
-                                ))}
-                            </RadioGroup>
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                )}
-            />
-            <FormField
-                name="decisionComplexity"
-                render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>What level of decision-making is required in this process?</FormLabel>
-                        <FormControl>
-                            <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="space-y-2 pt-1">
-                                {Options.decisionComplexityOptions.map(o => (
-                                    <FormItem key={o} className="flex items-center space-x-3 space-y-0">
-                                        <FormControl><RadioGroupItem value={o} /></FormControl>
-                                        <FormLabel className="font-normal">{o}</FormLabel>
-                                    </FormItem>
-                                ))}
-                            </RadioGroup>
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                )}
-            />
-             <FormField
-                name="communicationNeeds"
-                render={() => (
-                    <FormItem>
-                        <FormLabel>What types of communication does this process require?</FormLabel>
-                        <FormDescription>Select all that apply.</FormDescription>
-                        <div className="space-y-2 pt-2">
-                            {Options.communicationOptions.map(item => (
-                                <FormField
-                                    key={item}
-                                    name="communicationNeeds"
-                                    render={({ field }) => (
-                                    <FormItem key={item} className="flex flex-row items-start space-x-3 space-y-0">
-                                        <FormControl>
-                                            <Checkbox
-                                                checked={field.value?.includes(item)}
-                                                onCheckedChange={checked => {
-                                                    let updatedValue = [...(field.value || [])];
-                                                    if (item === "None of the above") {
-                                                        updatedValue = checked ? ["None of the above"] : [];
-                                                    } else {
-                                                        updatedValue = updatedValue.filter(v => v !== "None of the above");
-                                                        if (checked) {
-                                                            updatedValue.push(item);
-                                                        } else {
-                                                            updatedValue = updatedValue.filter(value => value !== item);
-                                                        }
-                                                    }
-                                                    field.onChange(updatedValue);
-                                                }}
-                                            />
-                                        </FormControl>
-                                        <FormLabel className="font-normal">{item}</FormLabel>
-                                    </FormItem>
-                                    )}
-                                />
-                            ))}
-                        </div>
-                        <FormMessage />
-                    </FormItem>
-                )}
-            />
-            <FormField
-                name="humanInLoop"
-                render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>How often does this process need human review or approval?</FormLabel>
-                        <FormControl>
-                            <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="space-y-2 pt-1">
-                                {Options.humanInLoopOptions.map(o => (
-                                    <FormItem key={o} className="flex items-center space-x-3 space-y-0">
-                                        <FormControl><RadioGroupItem value={o} /></FormControl>
-                                        <FormLabel className="font-normal">{o}</FormLabel>
-                                    </FormItem>
-                                ))}
-                            </RadioGroup>
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                )}
-            />
-        </div>
-    </div>
-);
+    

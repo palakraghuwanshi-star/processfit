@@ -64,7 +64,7 @@ export default function AnalysisPage() {
 
     const fetchData = async () => {
       try {
-        const idTokenResult = await user.getIdTokenResult();
+        const idTokenResult = await user.getIdTokenResult(true);
         setIsAdmin(!!idTokenResult.claims.isAdmin);
         
         const assessmentData = await getAssessment(user.uid, analysisId);
@@ -157,7 +157,7 @@ export default function AnalysisPage() {
                      <KeyInsights flags={data.flags} formData={data.formData} />
                 </div>
             </div>
-            {(isAdmin || user.uid) && (
+            {(isAdmin || (user && !user.isAnonymous)) && (
                 <>
                     <Separator />
                     <FullResponses formData={data.formData} />

@@ -30,6 +30,7 @@ export default function AnalysisPage() {
   const [progress, setProgress] = useState(0);
   const [aiAnalysis, setAiAnalysis] = useState<AnalyzeProcessOutput | null>(null);
   const [isAiLoading, setIsAiLoading] = useState(true);
+  const [isAuthCheckComplete, setIsAuthCheckComplete] = useState(false);
 
   useEffect(() => {
     if (isLoading) {
@@ -70,6 +71,7 @@ export default function AnalysisPage() {
       try {
         const idTokenResult = await user.getIdTokenResult(true);
         setIsAdmin(!!idTokenResult.claims.isAdmin);
+        setIsAuthCheckComplete(true);
         
         const assessmentData = await getAssessment(user.uid, analysisId);
         if (assessmentData) {
@@ -154,12 +156,14 @@ export default function AnalysisPage() {
                         For process: <span className="font-semibold text-primary">{data.formData.processName}</span>
                     </p>
                 </div>
-                <Button asChild variant="outline">
-                    <Link href={isAdmin ? "/admin/dashboard" : "/assessment"}>
-                        <ArrowLeft className="mr-2 h-4 w-4" />
-                        {isAdmin ? "Back to Dashboard" : "New Analysis"}
-                    </Link>
-                </Button>
+                {isAuthCheckComplete && (
+                  <Button asChild variant="outline">
+                      <Link href={isAdmin ? "/admin/dashboard" : "/assessment"}>
+                          <ArrowLeft className="mr-2 h-4 w-4" />
+                          {isAdmin ? "Back to Dashboard" : "New Analysis"}
+                      </Link>
+                  </Button>
+                )}
             </div>
         </header>
 

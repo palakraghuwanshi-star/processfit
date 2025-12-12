@@ -4,19 +4,20 @@
 import { useEffect, useState } from "react";
 import { notFound, useParams } from "next/navigation";
 import { useUser } from "@/firebase";
-import { getAssessment } from "@/app/lib/data-store";
-import type { AnalysisResult } from "@/app/lib/data-store";
+import { getAssessment, updateAssessmentWithAiData, type AnalysisResult } from "@/app/lib/data-store";
 import { ScoreSummary } from "@/app/components/analysis/score-summary";
 import { ScoreBreakdown } from "@/app/components/analysis/score-breakdown";
 import { PriorityMatrix } from "@/app/components/analysis/priority-matrix";
 import { KeyInsights } from "@/app/components/analysis/key-insights";
 import { FullResponses } from "@/app/components/analysis/full-responses";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft, Loader2, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
 import { Header } from "@/app/components/header";
 import { Progress } from "@/components/ui/progress";
+import { analyzeProcess, type AnalyzeProcessOutput } from "@/ai/flows/analyze-process-with-ai";
+import { AiAnalysis } from "@/app/components/analysis/ai-analysis";
 
 export default function AnalysisPage() {
   const { id: analysisId } = useParams() as { id: string };
@@ -26,6 +27,8 @@ export default function AnalysisPage() {
   const [error, setError] = useState<string | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [aiAnalysis, setAiAnalysis] = useState<AnalyzeProcessOutput | null>(null);
+  const [isAiLoading, setIsAiLoading] = useState(true);
 
   useEffect(() => {
     if (isLoading) {
@@ -70,6 +73,20 @@ export default function AnalysisPage() {
         const assessmentData = await getAssessment(user.uid, analysisId);
         if (assessmentData) {
           setData(assessmentData);
+          if (assessmentData.aiAnalysis) {
+              setAiAnalysis(assessmentData.aiAnalysis);
+              setIsAiLoading(false);
+          } else {
+              // Kick off AI analysis if it doesn't exist
+              const analysis = await analyzeProcess({
+                  formSnapshot: assessmentData.formData,
+                  scores: assessmentData.scores
+              });
+              setAiAnalysis(analysis);
+              // Save it back to DB - non-blocking
+              updateAssessmentWithAiData(user.uid, analysisId, analysis);
+              setIsAiLoading(false);
+          }
         } else {
           setError("Analysis not found.");
         }
@@ -78,6 +95,7 @@ export default function AnalysisPage() {
         setError("Failed to load analysis data.");
       } finally {
         setIsLoading(false);
+        setProgress(100);
       }
     };
 
@@ -146,6 +164,25 @@ export default function AnalysisPage() {
 
         <main className="p-6 sm:p-8 space-y-12">
             <ScoreSummary scores={data.scores} totalScore={150} />
+            
+            <Separator />
+             <div className="space-y-4">
+                <h2 className="text-2xl font-bold text-foreground flex items-center gap-2">
+                    <Sparkles className="h-6 w-6 text-primary" />
+                    AI-Powered Analysis & Recommendations
+                </h2>
+                {isAiLoading ? (
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                        <Loader2 className="h-5 w-5 animate-spin" />
+                        <span>Generating AI insights...</span>
+                    </div>
+                ) : aiAnalysis ? (
+                    <AiAnalysis analysis={aiAnalysis} />
+                ) : (
+                    <p className="text-muted-foreground">Could not generate AI analysis.</p>
+                )}
+            </div>
+
             <Separator />
             <PriorityMatrix businessImpact={data.scores.businessImpact} feasibility={data.scores.feasibility} />
             <Separator />

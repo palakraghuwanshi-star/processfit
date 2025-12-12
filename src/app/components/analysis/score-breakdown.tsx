@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts";
@@ -13,6 +14,7 @@ const maxScores = {
     riskCompliance: 30,
     feasibility: 30,
     strategicImpact: 40,
+    taskComplexity: 30,
 };
 
 export function ScoreBreakdown({ scores }: ScoreBreakdownProps) {
@@ -21,6 +23,7 @@ export function ScoreBreakdown({ scores }: ScoreBreakdownProps) {
     { name: "Cost & Efficiency", score: scores.costEfficiency, max: maxScores.costEfficiency },
     { name: "Risk & Compliance", score: scores.riskCompliance, max: maxScores.riskCompliance },
     { name: "Feasibility", score: scores.feasibility, max: maxScores.feasibility },
+    { name: "Task Complexity", score: scores.taskComplexityScore, max: maxScores.taskComplexity },
     { name: "Strategic Impact", score: scores.strategicImpact, max: maxScores.strategicImpact },
   ];
 
@@ -31,7 +34,7 @@ export function ScoreBreakdown({ scores }: ScoreBreakdownProps) {
           How your process scored in each key automation area.
       </p>
       <div className="mt-6">
-        <ResponsiveContainer width="100%" height={300}>
+        <ResponsiveContainer width="100%" height={350}>
           <BarChart data={data} layout="vertical" margin={{ left: 20, right: 20 }}>
             <XAxis type="number" hide />
             <YAxis

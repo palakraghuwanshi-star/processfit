@@ -147,6 +147,55 @@ const scoreROI = (roi: string): number => {
     }
 };
 
+// New scoring functions for Task Complexity
+const scoreDocumentProcessing = (value?: string): number | null => {
+    if (!value || value === "No documents involved") return null;
+    switch (value) {
+        case "Yes - Simple documents (single page, structured)": return 10;
+        case "Yes - Moderate complexity (multi-page, some unstructured data)": return 6;
+        case "Yes - High complexity (150+ pages, contracts with amendments, poor quality scans)": return 3;
+        default: return null;
+    }
+};
+
+const scoreCrossSystemValidation = (value?: string): number | null => {
+    if (!value || value === "No cross-system validation needed") return null;
+    switch (value) {
+        case "Yes - Validation across 2 systems": return 8;
+        case "Yes - Validation across 3-4 systems": return 5;
+        case "Yes - Complex validation across 5+ systems": return 2;
+        default: return null;
+    }
+};
+
+const scoreDecisionComplexity = (value: string): number => {
+    switch (value) {
+        case "Simple rules-based decisions (if/then logic)": return 10;
+        case "Moderate decisions with some exceptions": return 7;
+        case "Complex decisions requiring investigation and analysis": return 4;
+        case "Very complex decisions requiring business judgment and context": return 2;
+        default: return 0;
+    }
+};
+
+const scoreCommunicationNeeds = (values?: string[]): number | null => {
+    if (!values || values.length === 0 || values.includes("None of the above")) return null;
+    if (values.length === 1) return 10;
+    if (values.length === 2) return 8;
+    return 6; // 3+
+};
+
+const scoreHumanInLoop = (value: string): number => {
+    switch (value) {
+        case "Rarely (less than 5% of transactions)": return 10;
+        case "Occasionally (5-15% of transactions)": return 7;
+        case "Regularly (15-30% of transactions)": return 4;
+        case "Frequently (more than 30% of transactions)": return 2;
+        default: return 0;
+    }
+};
+
+
 // This function will now use the imported rules, although for now it's still hardcoded
 // a full dynamic implementation would require a rules engine.
 export const calculateScores = (data: FormValues): { scores: AnalysisScores, flags: string[] } => {
@@ -210,18 +259,39 @@ export const calculateScores = (data: FormValues): { scores: AnalysisScores, fla
 
     const strategicImpact = scoreBottleneck(data.processBottleneck) + scoreComplaints(data.stakeholderComplaints) + scoreGrowthLimitation(data.growthLimitation) + scoreROI(data.expectedROI);
 
+    // New Task Complexity Score Calculation
+    const complexityScores: (number | null)[] = [
+        scoreDocumentProcessing(data.documentProcessing),
+        scoreCrossSystemValidation(data.crossSystemValidation),
+        scoreDecisionComplexity(data.decisionComplexity),
+        scoreCommunicationNeeds(data.communicationNeeds),
+        scoreHumanInLoop(data.humanInLoop),
+    ];
+    
+    const applicableScores = complexityScores.filter(score => score !== null) as number[];
+    const averageComplexityScore = applicableScores.length > 0
+        ? applicableScores.reduce((acc, score) => acc + score, 0) / applicableScores.length
+        : 10; // Default to a high score if no questions were applicable.
+    
+    // Scale average (typically 2-10) to a 30-point scale
+    const taskComplexityScore = Math.round((averageComplexityScore / 10) * 30);
+
+
     const businessImpact = volumeScale + costEfficiency + riskCompliance + strategicImpact;
-    const totalScore = businessImpact + feasibility;
+    const totalScore = businessImpact + feasibility + taskComplexityScore;
 
     let category = "";
     let color = "";
-    if (businessImpact >= 90 && feasibility >= 25) {
+    // Note: Max feasibility is now 60 (30 from original + 30 from complexity)
+    const totalFeasibility = feasibility + taskComplexityScore;
+
+    if (businessImpact >= 90 && totalFeasibility >= 45) { // Adjusted threshold
         category = "QUICK WIN ⭐";
         color = "green";
-    } else if (businessImpact >= 90 && feasibility < 25) {
+    } else if (businessImpact >= 90 && totalFeasibility < 45) {
         category = "STRATEGIC LONG-TERM";
         color = "blue";
-    } else if (businessImpact < 90 && feasibility >= 25) {
+    } else if (businessImpact < 90 && totalFeasibility >= 45) {
         category = "INCREMENTAL GAINS";
         color = "orange";
     } else {
@@ -231,7 +301,7 @@ export const calculateScores = (data: FormValues): { scores: AnalysisScores, fla
     
     return {
         scores: {
-            volumeScale, costEfficiency, riskCompliance, feasibility, strategicImpact,
+            volumeScale, costEfficiency, riskCompliance, feasibility, strategicImpact, taskComplexityScore,
             businessImpact: Math.round(businessImpact),
             totalScore: Math.round(totalScore),
             category, color,

@@ -16,6 +16,7 @@ import {
   ArrowLeft,
   ArrowRight,
   Info,
+  Puzzle,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
@@ -98,6 +99,11 @@ const formSections = [
     icon: TrendingUp,
     fields: ['processBottleneck', 'stakeholderComplaints', 'growthLimitation', 'expectedROI'],
   },
+  {
+    title: 'Task Complexity',
+    icon: Puzzle,
+    fields: ['documentProcessing', 'crossSystemValidation', 'decisionComplexity', 'communicationNeeds', 'humanInLoop'],
+  }
 ] as const;
 
 type FieldName = (typeof formSections)[number]['fields'][number];
@@ -155,6 +161,12 @@ export function QuestionnaireForm() {
       stakeholderComplaints: undefined,
       growthLimitation: undefined,
       expectedROI: undefined,
+      // New fields
+      documentProcessing: undefined,
+      crossSystemValidation: undefined,
+      decisionComplexity: undefined,
+      communicationNeeds: [],
+      humanInLoop: undefined,
     },
   });
 
@@ -176,7 +188,7 @@ export function QuestionnaireForm() {
         return newCompleted;
     });
 
-    if (currentStep < formSections.length - 1) {
+    if (isValid && currentStep < formSections.length - 1) {
         setCurrentStep(prev => prev + 1);
     }
   };
@@ -273,6 +285,7 @@ export function QuestionnaireForm() {
               {currentStep === 4 && <Section5 />}
               {currentStep === 5 && <Section6 />}
               {currentStep === 6 && <Section7 />}
+              {currentStep === 7 && <Section8 />}
             </motion.div>
           </AnimatePresence>
 
@@ -1020,4 +1033,130 @@ const Section7 = () => (
       />
     </div>
   </div>
+);
+
+const Section8 = () => (
+    <div>
+        <FormSectionHeader title="Task Complexity" />
+        <div className="space-y-6 max-w-lg">
+            <FormField
+                name="documentProcessing"
+                render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Does this process involve processing documents (invoices, contracts, forms, receipts, etc.)?</FormLabel>
+                        <FormControl>
+                            <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="space-y-2 pt-1">
+                                {Options.documentProcessingOptions.map(o => (
+                                    <FormItem key={o} className="flex items-center space-x-3 space-y-0">
+                                        <FormControl><RadioGroupItem value={o} /></FormControl>
+                                        <FormLabel className="font-normal">{o}</FormLabel>
+                                    </FormItem>
+                                ))}
+                            </RadioGroup>
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
+            <FormField
+                name="crossSystemValidation"
+                render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Does this process require validating or matching data across multiple systems?</FormLabel>
+                        <FormControl>
+                            <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="space-y-2 pt-1">
+                                {Options.crossSystemValidationOptions.map(o => (
+                                    <FormItem key={o} className="flex items-center space-x-3 space-y-0">
+                                        <FormControl><RadioGroupItem value={o} /></FormControl>
+                                        <FormLabel className="font-normal">{o}</FormLabel>
+                                    </FormItem>
+                                ))}
+                            </RadioGroup>
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
+            <FormField
+                name="decisionComplexity"
+                render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>What level of decision-making is required in this process?</FormLabel>
+                        <FormControl>
+                            <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="space-y-2 pt-1">
+                                {Options.decisionComplexityOptions.map(o => (
+                                    <FormItem key={o} className="flex items-center space-x-3 space-y-0">
+                                        <FormControl><RadioGroupItem value={o} /></FormControl>
+                                        <FormLabel className="font-normal">{o}</FormLabel>
+                                    </FormItem>
+                                ))}
+                            </RadioGroup>
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
+             <FormField
+                name="communicationNeeds"
+                render={() => (
+                    <FormItem>
+                        <FormLabel>What types of communication does this process require?</FormLabel>
+                        <FormDescription>Select all that apply.</FormDescription>
+                        <div className="space-y-2 pt-2">
+                            {Options.communicationOptions.map(item => (
+                                <FormField
+                                    key={item}
+                                    name="communicationNeeds"
+                                    render={({ field }) => (
+                                    <FormItem key={item} className="flex flex-row items-start space-x-3 space-y-0">
+                                        <FormControl>
+                                            <Checkbox
+                                                checked={field.value?.includes(item)}
+                                                onCheckedChange={checked => {
+                                                    let updatedValue = [...(field.value || [])];
+                                                    if (item === "None of the above") {
+                                                        updatedValue = checked ? ["None of the above"] : [];
+                                                    } else {
+                                                        updatedValue = updatedValue.filter(v => v !== "None of the above");
+                                                        if (checked) {
+                                                            updatedValue.push(item);
+                                                        } else {
+                                                            updatedValue = updatedValue.filter(value => value !== item);
+                                                        }
+                                                    }
+                                                    field.onChange(updatedValue);
+                                                }}
+                                            />
+                                        </FormControl>
+                                        <FormLabel className="font-normal">{item}</FormLabel>
+                                    </FormItem>
+                                    )}
+                                />
+                            ))}
+                        </div>
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
+            <FormField
+                name="humanInLoop"
+                render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>How often does this process need human review or approval?</FormLabel>
+                        <FormControl>
+                            <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="space-y-2 pt-1">
+                                {Options.humanInLoopOptions.map(o => (
+                                    <FormItem key={o} className="flex items-center space-x-3 space-y-0">
+                                        <FormControl><RadioGroupItem value={o} /></FormControl>
+                                        <FormLabel className="font-normal">{o}</FormLabel>
+                                    </FormItem>
+                                ))}
+                            </RadioGroup>
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
+        </div>
+    </div>
 );

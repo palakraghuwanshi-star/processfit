@@ -99,3 +99,40 @@ export const roiTimelineOptions = [
   "6-12 months",
   "Less than 6 months",
 ] as const;
+
+// New Options for Task Complexity
+export const documentProcessingOptions = [
+    "No documents involved",
+    "Yes - Simple documents (single page, structured)",
+    "Yes - Moderate complexity (multi-page, some unstructured data)",
+    "Yes - High complexity (150+ pages, contracts with amendments, poor quality scans)",
+] as const;
+
+export const crossSystemValidationOptions = [
+    "No cross-system validation needed",
+    "Yes - Validation across 2 systems",
+    "Yes - Validation across 3-4 systems",
+    "Yes - Complex validation across 5+ systems",
+] as const;
+
+export const decisionComplexityOptions = [
+    "Simple rules-based decisions (if/then logic)",
+    "Moderate decisions with some exceptions",
+    "Complex decisions requiring investigation and analysis",
+    "Very complex decisions requiring business judgment and context",
+] as const;
+
+export const communicationOptions = [
+    "Email (reading, sending, responding)",
+    "Slack or instant messaging",
+    "Filling out forms or updating systems",
+    "Generating reports or documents",
+    "None of the above",
+] as const;
+
+export const humanInLoopOptions = [
+    "Rarely (less than 5% of transactions)",
+    "Occasionally (5-15% of transactions)",
+    "Regularly (15-30% of transactions)",
+    "Frequently (more than 30% of transactions)",
+] as const;

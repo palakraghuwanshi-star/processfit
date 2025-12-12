@@ -13,6 +13,11 @@ import {
   complaintsOptions,
   growthLimitOptions,
   roiTimelineOptions,
+  documentProcessingOptions,
+  crossSystemValidationOptions,
+  decisionComplexityOptions,
+  communicationOptions,
+  humanInLoopOptions
 } from './form-options';
 
 export const formSchema = z.object({
@@ -60,6 +65,13 @@ export const formSchema = z.object({
   stakeholderComplaints: z.enum(complaintsOptions, { required_error: "Please select an option." }),
   growthLimitation: z.enum(growthLimitOptions, { required_error: "Please select an option." }),
   expectedROI: z.enum(roiTimelineOptions, { required_error: "Please select an ROI." }),
+
+  // Section 8 (Task Complexity) - New
+  documentProcessing: z.enum(documentProcessingOptions).optional(),
+  crossSystemValidation: z.enum(crossSystemValidationOptions).optional(),
+  decisionComplexity: z.enum(decisionComplexityOptions, { required_error: "Please select an option." }),
+  communicationNeeds: z.array(z.enum(communicationOptions)).optional(),
+  humanInLoop: z.enum(humanInLoopOptions, { required_error: "Please select an option." }),
 });
 
 export type FormValues = z.infer<typeof formSchema>;

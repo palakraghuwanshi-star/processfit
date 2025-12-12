@@ -78,6 +78,29 @@
             ]
         },
         {
+            "title": "Task Complexity (Max: 30 points)",
+            "description": "Calculates a scaled score based on the average complexity of applicable manual tasks within the process.",
+            "rules": [
+                { "criteria": "Document Complexity: Simple", "score": "10 pts"},
+                { "criteria": "Document Complexity: Moderate", "score": "6 pts"},
+                { "criteria": "Document Complexity: High", "score": "3 pts"},
+                { "criteria": "Cross-System Validation: 2 Systems", "score": "8 pts"},
+                { "criteria": "Cross-System Validation: 3-4 Systems", "score": "5 pts"},
+                { "criteria": "Cross-System Validation: 5+ Systems", "score": "2 pts"},
+                { "criteria": "Decision Complexity: Simple Rules", "score": "10 pts"},
+                { "criteria": "Decision Complexity: Moderate", "score": "7 pts"},
+                { "criteria": "Decision Complexity: Complex", "score": "4 pts"},
+                { "criteria": "Decision Complexity: Very Complex", "score": "2 pts"},
+                { "criteria": "Communication Needs: 1 Type", "score": "10 pts"},
+                { "criteria": "Communication Needs: 2 Types", "score": "8 pts"},
+                { "criteria": "Communication Needs: 3+ Types", "score": "6 pts"},
+                { "criteria": "Human Review: Rarely", "score": "10 pts"},
+                { "criteria": "Human Review: Occasionally", "score": "7 pts"},
+                { "criteria": "Human Review: Regularly", "score": "4 pts"},
+                { "criteria": "Human Review: Frequently", "score": "2 pts"}
+            ]
+        },
+        {
             "title": "Strategic Impact (Max: 40 points)",
             "description": "Measures how automating this process aligns with broader business goals.",
             "rules": [
@@ -103,12 +126,12 @@
         },
         {
             "title": "Process Categorization",
-            "description": "The final recommendation is based on the combination of Business Impact and Feasibility scores.",
+            "description": "The final recommendation is based on the combination of Business Impact and Total Feasibility scores.",
             "rules": [
-                { "criteria": "Business Impact >= 90 AND Feasibility >= 25", "score": "QUICK WIN ⭐" },
-                { "criteria": "Business Impact >= 90 AND Feasibility < 25", "score": "STRATEGIC LONG-TERM" },
-                { "criteria": "Business Impact < 90 AND Feasibility >= 25", "score": "INCREMENTAL GAINS" },
-                { "criteria": "Business Impact < 90 AND Feasibility < 25", "score": "REVISIT" }
+                { "criteria": "Business Impact >= 90 AND Total Feasibility >= 45", "score": "QUICK WIN ⭐" },
+                { "criteria": "Business Impact >= 90 AND Total Feasibility < 45", "score": "STRATEGIC LONG-TERM" },
+                { "criteria": "Business Impact < 90 AND Total Feasibility >= 45", "score": "INCREMENTAL GAINS" },
+                { "criteria": "Business Impact < 90 AND Total Feasibility < 45", "score": "REVISIT" }
             ]
         }
     ]

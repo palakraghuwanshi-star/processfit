@@ -72,6 +72,30 @@ export const formSchema = z.object({
   decisionComplexity: z.enum(decisionComplexityOptions, { required_error: "Please select an option." }),
   communicationNeeds: z.array(z.enum(communicationOptions)).optional(),
   humanInLoop: z.enum(humanInLoopOptions, { required_error: "Please select an option." }),
+}).superRefine((data, ctx) => {
+    if (data.currentChallenges?.includes('Takes too long to complete') && !data.impactOfDelays) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['impactOfDelays'],
+            message: 'Please specify the impact of delays.',
+        });
+    }
+    if (data.documentationStatus === 'Partially documented' && data.documentationPercentage === undefined) {
+         ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['documentationPercentage'],
+            message: 'Please specify the percentage of documentation.',
+        });
+    }
+     if (data.documentationStatus === 'No documentation exists' && !data.reliesOnTribalKnowledge) {
+         ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['reliesOnTribalKnowledge'],
+            message: 'Please specify if the process relies on tribal knowledge.',
+        });
+    }
 });
 
 export type FormValues = z.infer<typeof formSchema>;
+
+    

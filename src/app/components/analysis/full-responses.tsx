@@ -42,7 +42,7 @@ const questionMap: Record<keyof FormValues, string> = {
     processName: "What is the name of the process you want to automate?",
     industry: "What industry is your organization in?",
     processDescription: "Please describe this process, including the main steps and systems involved.",
-    monthlyVolume: "How many transactions does this process handle per month?",
+    monthlyVolume: "How many requests does this process handle per month?",
     processFrequency: "How often does this process run?",
     teamSize: "Number of people working on this process (monthly)",
     timePercentage: "Average % of their monthly time spent on this process",
@@ -178,3 +178,5 @@ export function FullResponses({ formData }: FullResponsesProps) {
     </section>
   );
 }
+
+    

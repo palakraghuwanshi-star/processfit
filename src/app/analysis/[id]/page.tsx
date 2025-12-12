@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from "react";
 import { notFound, useParams } from "next/navigation";
-import { useUser, useAuth } from "@/firebase";
+import { useUser } from "@/firebase";
 import { getAssessment, updateAssessmentWithAiData, type AnalysisResult } from "@/app/lib/data-store";
 import { ScoreSummary } from "@/app/components/analysis/score-summary";
 import { ScoreBreakdown } from "@/app/components/analysis/score-breakdown";
@@ -157,14 +157,6 @@ export default function AnalysisPage() {
                         For process: <span className="font-semibold text-primary">{data.formData.processName}</span>
                     </p>
                 </div>
-                {isAuthCheckComplete && (
-                  <Button asChild variant="outline">
-                      <Link href={isAdmin ? "/admin/dashboard" : "/assessment"}>
-                          <ArrowLeft className="mr-2 h-4 w-4" />
-                          {isAdmin ? "Back to Dashboard" : "New Analysis"}
-                      </Link>
-                  </Button>
-                )}
             </div>
         </header>
 

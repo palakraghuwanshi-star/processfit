@@ -228,17 +228,6 @@ export const calculateScores = (data: FormValues): { scores: AnalysisScores, fla
         flags.push("❌ Integration blocker: All systems are on internal network only");
     }
 
-    let feasibilityPenalty = 0;
-    if (data.documentationStatus === "No documentation exists" || data.documentationStatus === "Partially documented") {
-        feasibilityPenalty = 3;
-    }
-    const rawFeasibility = Math.max(0, stdScore) + docScore + excScore + apiScore + accessScore;
-    let feasibility = (rawFeasibility / 50) * 30 - feasibilityPenalty;
-    feasibility = Math.max(0, Math.round(feasibility));
-
-    const painPoints = scoreErrorRate(data.errorRate) + scoreDelayImpact(data.impactOfDelays);
-    const strategicImpact = scoreBottleneck(data.processBottleneck) + scoreComplaints(data.stakeholderComplaints) + scoreGrowthLimitation(data.growthLimitation) + scoreROI(data.expectedROI) + painPoints + scoreCompliance(data.complianceRequirements);
-
     // New Task Complexity Score Calculation
     const complexityScores: (number | null)[] = [
         scoreDocumentProcessing(data.documentProcessing),
@@ -255,21 +244,31 @@ export const calculateScores = (data: FormValues): { scores: AnalysisScores, fla
     const taskComplexityScore = Math.round((averageComplexityScore / 10) * 30);
 
 
+    let feasibilityPenalty = 0;
+    if (data.documentationStatus === "No documentation exists" || data.documentationStatus === "Partially documented") {
+        feasibilityPenalty = 3;
+    }
+    const rawFeasibility = Math.max(0, stdScore) + docScore + excScore + apiScore + accessScore;
+    let baseFeasibility = (rawFeasibility / 50) * 30 - feasibilityPenalty;
+    const feasibility = Math.max(0, Math.round(baseFeasibility)) + taskComplexityScore;
+
+    const painPoints = scoreErrorRate(data.errorRate) + scoreDelayImpact(data.impactOfDelays);
+    const strategicImpact = scoreBottleneck(data.processBottleneck) + scoreComplaints(data.stakeholderComplaints) + scoreGrowthLimitation(data.growthLimitation) + scoreROI(data.expectedROI) + painPoints + scoreCompliance(data.complianceRequirements);
+
+
     const businessImpact = volumeScale + costEfficiency + strategicImpact;
-    const totalFeasibility = feasibility + taskComplexityScore;
-    const totalScore = businessImpact + totalFeasibility;
+    const totalScore = businessImpact + feasibility;
 
     let category = "";
     let color = "";
-    // Note: Max feasibility is now 60 (30 from original + 30 from complexity)
     
-    if (businessImpact >= 90 && totalFeasibility >= 45) { // Adjusted threshold
+    if (businessImpact >= 90 && feasibility >= 45) { // Adjusted threshold
         category = "QUICK WIN ⭐";
         color = "green";
-    } else if (businessImpact >= 90 && totalFeasibility < 45) {
+    } else if (businessImpact >= 90 && feasibility < 45) {
         category = "STRATEGIC LONG-TERM";
         color = "blue";
-    } else if (businessImpact < 90 && totalFeasibility >= 45) {
+    } else if (businessImpact < 90 && feasibility >= 45) {
         category = "INCREMENTAL GAINS";
         color = "orange";
     } else {
@@ -283,7 +282,6 @@ export const calculateScores = (data: FormValues): { scores: AnalysisScores, fla
             costEfficiency, 
             feasibility, 
             strategicImpact, 
-            taskComplexityScore,
             businessImpact: Math.round(businessImpact),
             totalScore: Math.round(totalScore),
             category, 

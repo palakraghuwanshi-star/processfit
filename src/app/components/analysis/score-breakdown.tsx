@@ -11,19 +11,15 @@ interface ScoreBreakdownProps {
 const maxScores = {
     volumeScale: 20,
     costEfficiency: 30,
-    riskCompliance: 30,
-    feasibility: 30,
+    feasibility: 60, // Combined feasibility and task complexity
     strategicImpact: 40,
-    taskComplexity: 30,
 };
 
 export function ScoreBreakdown({ scores }: ScoreBreakdownProps) {
   const data = [
     { name: "Volume & Scale", score: scores.volumeScale, max: maxScores.volumeScale },
     { name: "Cost & Efficiency", score: scores.costEfficiency, max: maxScores.costEfficiency },
-    { name: "Risk & Compliance", score: scores.riskCompliance, max: maxScores.riskCompliance },
     { name: "Feasibility", score: scores.feasibility, max: maxScores.feasibility },
-    { name: "Task Complexity", score: scores.taskComplexityScore, max: maxScores.taskComplexity },
     { name: "Strategic Impact", score: scores.strategicImpact, max: maxScores.strategicImpact },
   ];
 

@@ -116,7 +116,7 @@ export default function AnalysisPage() {
     );
   }
   
-  if (!data) {
+  if (!data || !data.scores) {
     return notFound();
   }
 
@@ -145,9 +145,9 @@ export default function AnalysisPage() {
         </header>
 
         <main className="p-6 sm:p-8 space-y-12">
-            <ScoreSummary scores={data.scores} totalScore={180} />
+            <ScoreSummary scores={data.scores} totalScore={150} />
             <Separator />
-            <PriorityMatrix businessImpact={data.scores.businessImpact} feasibility={data.scores.feasibility + data.scores.taskComplexityScore} />
+            <PriorityMatrix businessImpact={data.scores.businessImpact} feasibility={data.scores.feasibility} />
             <Separator />
             <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
                 <div className="md:col-span-3">

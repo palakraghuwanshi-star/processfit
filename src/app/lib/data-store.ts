@@ -1,3 +1,4 @@
+
 'use client';
 
 import type { FormValues } from '@/app/lib/schema';
@@ -11,7 +12,6 @@ export type AnalysisScores = {
     costEfficiency: number;
     feasibility: number;
     strategicImpact: number;
-    taskComplexityScore: number;
     businessImpact: number;
     totalScore: number;
     category: string;

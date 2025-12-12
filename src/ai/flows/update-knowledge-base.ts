@@ -6,7 +6,7 @@
  * - KnowledgeBaseInput - The input type for the updateKnowledgeBase function.
  */
 
-import { ai } from '@/ai/genkit';
+import { getAi } from '@/ai/genkit';
 import { z } from 'genkit';
 import { updateFile } from '@/app/lib/update-file';
 
@@ -20,7 +20,7 @@ export async function updateKnowledgeBase(input: KnowledgeBaseInput): Promise<{ 
   return updateKnowledgeBaseFlow(input);
 }
 
-const updateKnowledgeBaseFlow = ai.defineFlow(
+const updateKnowledgeBaseFlow = getAi().defineFlow(
   {
     name: 'updateKnowledgeBaseFlow',
     inputSchema: KnowledgeBaseInputSchema,

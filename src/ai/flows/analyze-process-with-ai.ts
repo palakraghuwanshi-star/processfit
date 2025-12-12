@@ -5,7 +5,7 @@
  * - analyzeProcess - A function that takes form data and scores, returning an AI-driven analysis.
  */
 
-import { ai } from '@/ai/genkit';
+import { getAi } from '@/ai/genkit';
 import scoringRules from '@/app/lib/scoring-rules.json';
 import { AnalyzeProcessInputSchema, AnalyzeProcessOutputSchema, type AnalyzeProcessInput, type AnalyzeProcessOutput } from './types';
 
@@ -14,7 +14,7 @@ export async function analyzeProcess(input: AnalyzeProcessInput): Promise<Analyz
   return analyzeProcessFlow(input);
 }
 
-const prompt = ai.definePrompt({
+const prompt = getAi().definePrompt({
   name: 'analyzeProcessPrompt',
   input: { schema: AnalyzeProcessInputSchema },
   output: { schema: AnalyzeProcessOutputSchema },
@@ -34,7 +34,7 @@ Here is the data for the process:
 `,
 });
 
-const analyzeProcessFlow = ai.defineFlow(
+const analyzeProcessFlow = getAi().defineFlow(
   {
     name: 'analyzeProcessFlow',
     inputSchema: AnalyzeProcessInputSchema,

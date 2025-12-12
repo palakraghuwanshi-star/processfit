@@ -66,8 +66,6 @@ const questionMap: Record<keyof FormValues, string> = {
     expectedROI: "Based on expected savings, when do you estimate payback?",
     // New Questions
     documentProcessing: "Does this process involve processing documents (invoices, contracts, forms, receipts, etc.)?",
-    crossSystemValidation: "Does this process require validating or matching data across multiple systems?",
-    decisionComplexity: "What level of decision-making is required in this process?",
     communicationNeeds: "What types of communication does this process require?",
     humanInLoop: "How often does this process need human review or approval?",
 };
@@ -102,8 +100,6 @@ const orderedFields: (keyof FormValues)[] = [
     'growthLimitation',
     'expectedROI',
     'documentProcessing',
-    'crossSystemValidation',
-    'decisionComplexity',
     'communicationNeeds',
     'humanInLoop',
 ];
@@ -178,5 +174,3 @@ export function FullResponses({ formData }: FullResponsesProps) {
     </section>
   );
 }
-
-    

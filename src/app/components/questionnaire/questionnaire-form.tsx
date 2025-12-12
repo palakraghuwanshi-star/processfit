@@ -1,7 +1,8 @@
+
 'use client';
 
 import * as React from 'react';
-import { useForm, FormProvider, useFormContext } from 'react-hook-form';
+import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
@@ -57,7 +58,7 @@ const formSections = [
     icon: FileText,
     fields: [
         'organizationName', 'yourName', 'processName', 'industry', 'processDescription',
-        'documentProcessing', 'crossSystemValidation', 'decisionComplexity', 'communicationNeeds', 'humanInLoop'
+        'documentProcessing', 'communicationNeeds', 'humanInLoop'
     ],
   },
   {
@@ -147,8 +148,6 @@ export function QuestionnaireForm() {
       expectedROI: undefined,
       // New fields
       documentProcessing: undefined,
-      crossSystemValidation: undefined,
-      decisionComplexity: undefined,
       communicationNeeds: [],
       humanInLoop: undefined,
     },
@@ -413,44 +412,6 @@ const Section1 = () => (
                         <FormControl>
                             <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="space-y-2 pt-1">
                                 {Options.documentProcessingOptions.map(o => (
-                                    <FormItem key={o} className="flex items-center space-x-3 space-y-0">
-                                        <FormControl><RadioGroupItem value={o} /></FormControl>
-                                        <FormLabel className="font-normal">{o}</FormLabel>
-                                    </FormItem>
-                                ))}
-                            </RadioGroup>
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                )}
-            />
-            <FormField
-                name="crossSystemValidation"
-                render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>Does this process require validating or matching data across multiple systems?</FormLabel>
-                        <FormControl>
-                            <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="space-y-2 pt-1">
-                                {Options.crossSystemValidationOptions.map(o => (
-                                    <FormItem key={o} className="flex items-center space-x-3 space-y-0">
-                                        <FormControl><RadioGroupItem value={o} /></FormControl>
-                                        <FormLabel className="font-normal">{o}</FormLabel>
-                                    </FormItem>
-                                ))}
-                            </RadioGroup>
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                )}
-            />
-            <FormField
-                name="decisionComplexity"
-                render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>What level of decision-making is required in this process?</FormLabel>
-                        <FormControl>
-                            <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="space-y-2 pt-1">
-                                {Options.decisionComplexityOptions.map(o => (
                                     <FormItem key={o} className="flex items-center space-x-3 space-y-0">
                                         <FormControl><RadioGroupItem value={o} /></FormControl>
                                         <FormLabel className="font-normal">{o}</FormLabel>

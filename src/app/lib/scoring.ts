@@ -1,6 +1,6 @@
+
 import type { FormValues } from '@/app/lib/schema';
 import type { AnalysisScores } from '@/app/lib/data-store';
-import scoringRules from './scoring-rules.json';
 
 const scoreTotalMonthlyValue = (volume: number, cost: number): number => {
     const totalValue = volume * cost;
@@ -53,15 +53,6 @@ const scoreErrorRate = (rate: number): number => {
     if (rate <= 15) return 8;
     if (rate <= 20) return 9;
     return 10;
-};
-
-const scoreCompliance = (reqs: string[]): number => {
-    if (reqs.includes("Multiple high-level regulatory requirements")) return 10;
-    if (reqs.includes("Government regulations (SOX, FDA, GDPR, etc.)")) return 8;
-    if (reqs.includes("Industry standards (ISO, etc.)")) return 6;
-    if (reqs.includes("Internal audit only")) return 4;
-    if (reqs.includes("None")) return 2;
-    return 0;
 };
 
 const scoreDelayImpact = (impact: string | undefined): number => {
@@ -146,6 +137,16 @@ const scoreROI = (roi: string): number => {
     }
 };
 
+const scoreCompliance = (reqs: string[]): number => {
+    if (reqs.includes("Multiple high-level regulatory requirements")) return 10;
+    if (reqs.includes("Government regulations (SOX, FDA, GDPR, etc.)")) return 8;
+    if (reqs.includes("Industry standards (ISO, etc.)")) return 6;
+    if (reqs.includes("Internal audit only")) return 4;
+    if (reqs.includes("None")) return 2;
+    return 0;
+};
+
+
 // New scoring functions for Task Complexity
 const scoreDocumentProcessing = (value?: string): number | null => {
     if (!value || value === "No documents involved") return null;
@@ -154,26 +155,6 @@ const scoreDocumentProcessing = (value?: string): number | null => {
         case "Yes - Moderate complexity (multi-page, some unstructured data)": return 6;
         case "Yes - High complexity (150+ pages, contracts with amendments, poor quality scans)": return 3;
         default: return null;
-    }
-};
-
-const scoreCrossSystemValidation = (value?: string): number | null => {
-    if (!value || value === "No cross-system validation needed") return null;
-    switch (value) {
-        case "Yes - Validation across 2 systems": return 8;
-        case "Yes - Validation across 3-4 systems": return 5;
-        case "Yes - Complex validation across 5+ systems": return 2;
-        default: return null;
-    }
-};
-
-const scoreDecisionComplexity = (value: string): number => {
-    switch (value) {
-        case "Simple rules-based decisions (if/then logic)": return 10;
-        case "Moderate decisions with some exceptions": return 7;
-        case "Complex decisions requiring investigation and analysis": return 4;
-        case "Very complex decisions requiring business judgment and context": return 2;
-        default: return 0;
     }
 };
 
@@ -256,13 +237,11 @@ export const calculateScores = (data: FormValues): { scores: AnalysisScores, fla
     feasibility = Math.max(0, Math.round(feasibility));
 
     const painPoints = scoreErrorRate(data.errorRate) + scoreDelayImpact(data.impactOfDelays);
-    const strategicImpact = scoreBottleneck(data.processBottleneck) + scoreComplaints(data.stakeholderComplaints) + scoreGrowthLimitation(data.growthLimitation) + scoreROI(data.expectedROI) + scoreCompliance(data.complianceRequirements) + painPoints;
+    const strategicImpact = scoreBottleneck(data.processBottleneck) + scoreComplaints(data.stakeholderComplaints) + scoreGrowthLimitation(data.growthLimitation) + scoreROI(data.expectedROI) + painPoints + scoreCompliance(data.complianceRequirements);
 
     // New Task Complexity Score Calculation
     const complexityScores: (number | null)[] = [
         scoreDocumentProcessing(data.documentProcessing),
-        scoreCrossSystemValidation(data.crossSystemValidation),
-        scoreDecisionComplexity(data.decisionComplexity),
         scoreCommunicationNeeds(data.communicationNeeds),
         scoreHumanInLoop(data.humanInLoop),
     ];

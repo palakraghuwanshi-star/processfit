@@ -58,6 +58,7 @@ export default function AnalysisPage() {
         if (!user) {
           setError("You must be logged in to view this page.");
           setIsLoading(false);
+          setIsAuthCheckComplete(true);
         }
       }, 1500);
       return () => clearTimeout(timer);
@@ -71,7 +72,6 @@ export default function AnalysisPage() {
       try {
         const idTokenResult = await user.getIdTokenResult(true);
         setIsAdmin(!!idTokenResult.claims.isAdmin);
-        setIsAuthCheckComplete(true);
         
         const assessmentData = await getAssessment(user.uid, analysisId);
         if (assessmentData) {
@@ -99,6 +99,7 @@ export default function AnalysisPage() {
       } finally {
         setIsLoading(false);
         setProgress(100);
+        setIsAuthCheckComplete(true);
       }
     };
 
@@ -106,7 +107,7 @@ export default function AnalysisPage() {
 
   }, [user, isUserLoading, analysisId]);
 
-  if (isLoading || isUserLoading) {
+  if (isLoading || isUserLoading || !isAuthCheckComplete) {
     return (
         <div className="flex min-h-screen w-full items-center justify-center bg-background">
             <div className="w-full max-w-md text-center">

@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from "react";
 import { notFound, useParams } from "next/navigation";
-import { useUser } from "@/firebase";
+import { useUser, useAuth, updateAssessmentWithAiData } from "@/firebase";
 import { getAssessment, type AnalysisResult } from "@/app/lib/data-store";
 import { ScoreSummary } from "@/app/components/analysis/score-summary";
 import { ScoreBreakdown } from "@/app/components/analysis/score-breakdown";
@@ -169,7 +169,7 @@ export default function AnalysisPage() {
         </header>
 
         <main className="p-6 sm:p-8 space-y-12">
-            <ScoreSummary scores={data.scores} totalScore={150} />
+            <ScoreSummary scores={data.scores} />
             
             <Separator />
              <div className="space-y-4">
@@ -190,7 +190,7 @@ export default function AnalysisPage() {
             </div>
 
             <Separator />
-            <PriorityMatrix businessImpact={data.scores.businessImpact} feasibility={data.scores.feasibility} />
+            <PriorityMatrix businessImpact={data.scores.businessImpactScore} feasibility={data.scores.feasibilityScore} />
             <Separator />
             <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
                 <div className="md:col-span-3">

@@ -71,9 +71,9 @@ const formSections = [
     fields: ['teamSize', 'timePercentage', 'averageProcessingTime', 'costPerTransaction'],
   },
   {
-    title: 'Pain Points',
+    title: 'Impact & Pain Points',
     icon: HeartPulse,
-    fields: ['currentChallenges', 'impactOfDelays', 'biggestPainPoint', 'errorRate'],
+    fields: ['currentChallenges', 'impactOfDelays', 'biggestPainPoint', 'errorRate', 'processBottleneck', 'stakeholderComplaints', 'growthLimitation', 'expectedROI', 'complianceRequirements'],
   },
   {
     title: 'Feasibility',
@@ -87,11 +87,6 @@ const formSections = [
       'systems',
       'systemAccess',
     ],
-  },
-  {
-    title: 'Strategic Impact',
-    icon: TrendingUp,
-    fields: ['processBottleneck', 'stakeholderComplaints', 'growthLimitation', 'expectedROI', 'complianceRequirements'],
   },
 ] as const;
 
@@ -272,7 +267,6 @@ export function QuestionnaireForm() {
               {currentStep === 2 && <Section3 />}
               {currentStep === 3 && <Section4 />}
               {currentStep === 4 && <Section5 />}
-              {currentStep === 5 && <Section6 />}
             </motion.div>
           </AnimatePresence>
 
@@ -300,7 +294,7 @@ export function QuestionnaireForm() {
                 {isPending ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : (
-                  'Submit'
+                  'Submit for Analysis'
                 )}
               </Button>
             )}
@@ -537,7 +531,7 @@ const Section1 = () => (
 
 const Section2 = () => (
   <div>
-    <FormSectionHeader title="Volume & Scale" />
+    <FormSectionHeader title="Volume &amp; Scale" />
     <div className="space-y-6 max-w-md">
       <FormField
         name="monthlyVolume"
@@ -582,7 +576,7 @@ const Section2 = () => (
 
 const Section3 = () => (
   <div>
-    <FormSectionHeader title="Cost & Efficiency" />
+    <FormSectionHeader title="Cost &amp; Efficiency" />
     <div className="space-y-6">
       <FormItem>
         <FormLabel>
@@ -693,118 +687,263 @@ const Section4 = () => {
 
   return (
     <div>
-      <FormSectionHeader title="Pain Points" />
-      <div className="space-y-6 max-w-lg">
-        <FormField
-          name="currentChallenges"
-          render={() => (
-            <FormItem>
-              <FormLabel>
-                What are the main challenges with this process? (Select all that apply)
-              </FormLabel>
-              <div className="space-y-2 pt-2">
-                {Options.challengesOptions.map(item => (
-                  <FormField
-                    key={item}
-                    name="currentChallenges"
-                    render={({ field }) => (
-                      <FormItem
+      <FormSectionHeader title="Impact &amp; Pain Points" />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+        <div className="space-y-6">
+            <FormField
+            name="currentChallenges"
+            render={() => (
+                <FormItem>
+                <FormLabel>
+                    What are the main challenges with this process? (Select all that apply)
+                </FormLabel>
+                <div className="space-y-2 pt-2">
+                    {Options.challengesOptions.map(item => (
+                    <FormField
                         key={item}
-                        className="flex flex-row items-start space-x-3 space-y-0"
-                      >
-                        <FormControl>
-                          <Checkbox
-                            checked={field.value?.includes(item)}
-                            onCheckedChange={checked => {
-                              return checked
-                                ? field.onChange([...(field.value || []), item])
-                                : field.onChange(field.value?.filter(value => value !== item));
-                            }}
-                          />
-                        </FormControl>
-                        <FormLabel className="font-normal">{item}</FormLabel>
-                      </FormItem>
-                    )}
-                  />
-                ))}
-              </div>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                        name="currentChallenges"
+                        render={({ field }) => (
+                        <FormItem
+                            key={item}
+                            className="flex flex-row items-start space-x-3 space-y-0"
+                        >
+                            <FormControl>
+                            <Checkbox
+                                checked={field.value?.includes(item)}
+                                onCheckedChange={checked => {
+                                return checked
+                                    ? field.onChange([...(field.value || []), item])
+                                    : field.onChange(field.value?.filter(value => value !== item));
+                                }}
+                            />
+                            </FormControl>
+                            <FormLabel className="font-normal">{item}</FormLabel>
+                        </FormItem>
+                        )}
+                    />
+                    ))}
+                </div>
+                <FormMessage />
+                </FormItem>
+            )}
+            />
 
-        <AnimatePresence>
-          {showImpactOfDelays && (
-            <motion.div
-              initial={{ opacity: 0, height: 0, marginTop: 0 }}
-              animate={{ opacity: 1, height: 'auto', marginTop: '1.5rem' }}
-              exit={{ opacity: 0, height: 0, marginTop: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <FormField
-                name="impactOfDelays"
+            <AnimatePresence>
+            {showImpactOfDelays && (
+                <motion.div
+                initial={{ opacity: 0, height: 0, marginTop: 0 }}
+                animate={{ opacity: 1, height: 'auto', marginTop: '1.5rem' }}
+                exit={{ opacity: 0, height: 0, marginTop: 0 }}
+                transition={{ duration: 0.3 }}
+                >
+                <FormField
+                    name="impactOfDelays"
+                    render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>What happens when this process is delayed?</FormLabel>
+                        <FormControl>
+                        <RadioGroup
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            className="space-y-2 pt-1"
+                        >
+                            {Options.delayImpactOptions.map(o => (
+                            <FormItem key={o} className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                <RadioGroupItem value={o} />
+                                </FormControl>
+                                <FormLabel className="font-normal">{o}</FormLabel>
+                            </FormItem>
+                            ))}
+                        </RadioGroup>
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                    )}
+                />
+                </motion.div>
+            )}
+            </AnimatePresence>
+
+            <FormField
+            name="biggestPainPoint"
+            render={({ field }) => (
+                <FormItem>
+                <FormLabel>
+                    What is the single biggest problem or frustration with this process?
+                </FormLabel>
+                <FormControl>
+                    <Textarea placeholder="Describe your top pain point..." {...field} rows={4} />
+                </FormControl>
+                <FormMessage />
+                </FormItem>
+            )}
+            />
+            
+            <FormField
+                name="errorRate"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>What happens when this process is delayed?</FormLabel>
+                <FormItem>
+                    <FormLabel>
+                    Approximately what percentage of requests require rework due to errors?
+                    </FormLabel>
                     <FormControl>
-                      <RadioGroup
+                    <Input
+                        type="number"
+                        placeholder="e.g., 15"
+                        endIcon="%"
+                        {...field}
+                        value={field.value ?? ''}
+                    />
+                    </FormControl>
+                    <FormMessage />
+                </FormItem>
+                )}
+            />
+        </div>
+        <div className="space-y-6">
+            <FormField
+                name="processBottleneck"
+                render={({ field }) => (
+                <FormItem>
+                    <FormLabel>Does this process create bottlenecks for other operations?</FormLabel>
+                    <FormControl>
+                    <RadioGroup
                         onValueChange={field.onChange}
                         defaultValue={field.value}
                         className="space-y-2 pt-1"
-                      >
-                        {Options.delayImpactOptions.map(o => (
-                          <FormItem key={o} className="flex items-center space-x-3 space-y-0">
+                    >
+                        {Options.bottleneckOptions.map(o => (
+                        <FormItem key={o} className="flex items-center space-x-3 space-y-0">
                             <FormControl>
-                              <RadioGroupItem value={o} />
+                            <RadioGroupItem value={o} />
                             </FormControl>
                             <FormLabel className="font-normal">{o}</FormLabel>
-                          </FormItem>
+                        </FormItem>
                         ))}
-                      </RadioGroup>
+                    </RadioGroup>
                     </FormControl>
                     <FormMessage />
-                  </FormItem>
+                </FormItem>
                 )}
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        <FormField
-          name="biggestPainPoint"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>
-                What is the single biggest problem or frustration with this process?
-              </FormLabel>
-              <FormControl>
-                <Textarea placeholder="Describe your top pain point..." {...field} rows={4} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        
-        <FormField
-            name="errorRate"
-            render={({ field }) => (
-            <FormItem>
-                <FormLabel>
-                Approximately what percentage of requests require rework due to errors?
-                </FormLabel>
-                <FormControl>
-                <Input
-                    type="number"
-                    placeholder="e.g., 15"
-                    endIcon="%"
-                    {...field}
-                    value={field.value ?? ''}
-                />
-                </FormControl>
-                <FormMessage />
-            </FormItem>
-            )}
-        />
+            />
+            <FormField
+                name="stakeholderComplaints"
+                render={({ field }) => (
+                <FormItem>
+                    <FormLabel>How often do you receive complaints about this process?</FormLabel>
+                    <FormControl>
+                    <RadioGroup
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        className="space-y-2 pt-1"
+                    >
+                        {Options.complaintsOptions.map(o => (
+                        <FormItem key={o} className="flex items-center space-x-3 space-y-0">
+                            <FormControl>
+                            <RadioGroupItem value={o} />
+                            </FormControl>
+                            <FormLabel className="font-normal">{o}</FormLabel>
+                        </FormItem>
+                        ))}
+                    </RadioGroup>
+                    </FormControl>
+                    <FormMessage />
+                </FormItem>
+                )}
+            />
+            <FormField
+                name="growthLimitation"
+                render={({ field }) => (
+                <FormItem>
+                    <FormLabel>
+                    Is this manual process limiting your ability to scale or grow?
+                    </FormLabel>
+                    <FormControl>
+                    <RadioGroup
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        className="space-y-2 pt-1"
+                    >
+                        {Options.growthLimitOptions.map(o => (
+                        <FormItem key={o} className="flex items-center space-x-3 space-y-0">
+                            <FormControl>
+                            <RadioGroupItem value={o} />
+                            </FormControl>
+                            <FormLabel className="font-normal">{o}</FormLabel>
+                        </FormItem>
+                        ))}
+                    </RadioGroup>
+                    </FormControl>
+                    <FormMessage />
+                </FormItem>
+                )}
+            />
+            <FormField
+                name="expectedROI"
+                render={({ field }) => (
+                <FormItem>
+                    <FormLabel>Based on expected savings, when do you estimate payback?</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                        <SelectTrigger>
+                        <SelectValue placeholder="Select a timeline" />
+                        </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                        {Options.roiTimelineOptions.map(o => (
+                        <SelectItem key={o} value={o}>
+                            {o}
+                        </SelectItem>
+                        ))}
+                    </SelectContent>
+                    </Select>
+                    <FormMessage />
+                </FormItem>
+                )}
+            />
+            <FormField
+                name="complianceRequirements"
+                render={() => (
+                <FormItem>
+                    <FormLabel>
+                    What compliance or regulatory requirements apply to this process? (Select all that
+                    apply)
+                    </FormLabel>
+                    <div className="space-y-2 pt-2">
+                    {Options.complianceOptions.map(item => (
+                        <FormField
+                        key={item}
+                        name="complianceRequirements"
+                        render={({ field }) => (
+                            <FormItem
+                            key={item}
+                            className="flex flex-row items-start space-x-3 space-y-0"
+                            >
+                            <FormControl>
+                                <Checkbox
+                                checked={field.value?.includes(item)}
+                                onCheckedChange={checked => {
+                                    const currentValues = field.value || [];
+                                    if (checked) {
+                                    field.onChange([...currentValues, item]);
+                                    } else {
+                                    field.onChange(currentValues.filter(value => value !== item));
+                                    }
+                                }}
+                                />
+                            </FormControl>
+                            <FormLabel className="font-normal">{item}</FormLabel>
+                            </FormItem>
+                        )}
+                        />
+                    ))}
+                    </div>
+                    <FormMessage />
+                </FormItem>
+                )}
+            />
+        </div>
       </div>
     </div>
   );
@@ -991,158 +1130,3 @@ const Section5 = () => {
     </div>
   );
 };
-
-const Section6 = () => (
-  <div>
-    <FormSectionHeader title="Strategic Impact" />
-    <div className="space-y-6 max-w-lg">
-      <FormField
-        name="processBottleneck"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Does this process create bottlenecks for other operations?</FormLabel>
-            <FormControl>
-              <RadioGroup
-                onValueChange={field.onChange}
-                defaultValue={field.value}
-                className="space-y-2 pt-1"
-              >
-                {Options.bottleneckOptions.map(o => (
-                  <FormItem key={o} className="flex items-center space-x-3 space-y-0">
-                    <FormControl>
-                      <RadioGroupItem value={o} />
-                    </FormControl>
-                    <FormLabel className="font-normal">{o}</FormLabel>
-                  </FormItem>
-                ))}
-              </RadioGroup>
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-      <FormField
-        name="stakeholderComplaints"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>How often do you receive complaints about this process?</FormLabel>
-            <FormControl>
-              <RadioGroup
-                onValueChange={field.onChange}
-                defaultValue={field.value}
-                className="space-y-2 pt-1"
-              >
-                {Options.complaintsOptions.map(o => (
-                  <FormItem key={o} className="flex items-center space-x-3 space-y-0">
-                    <FormControl>
-                      <RadioGroupItem value={o} />
-                    </FormControl>
-                    <FormLabel className="font-normal">{o}</FormLabel>
-                  </FormItem>
-                ))}
-              </RadioGroup>
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-      <FormField
-        name="growthLimitation"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>
-              Is this manual process limiting your ability to scale or grow?
-            </FormLabel>
-            <FormControl>
-              <RadioGroup
-                onValueChange={field.onChange}
-                defaultValue={field.value}
-                className="space-y-2 pt-1"
-              >
-                {Options.growthLimitOptions.map(o => (
-                  <FormItem key={o} className="flex items-center space-x-3 space-y-0">
-                    <FormControl>
-                      <RadioGroupItem value={o} />
-                    </FormControl>
-                    <FormLabel className="font-normal">{o}</FormLabel>
-                  </FormItem>
-                ))}
-              </RadioGroup>
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-      <FormField
-        name="expectedROI"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Based on expected savings, when do you estimate payback?</FormLabel>
-            <Select onValueChange={field.onChange} defaultValue={field.value}>
-              <FormControl>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a timeline" />
-                </SelectTrigger>
-              </FormControl>
-              <SelectContent>
-                {Options.roiTimelineOptions.map(o => (
-                  <SelectItem key={o} value={o}>
-                    {o}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-      <FormField
-        name="complianceRequirements"
-        render={() => (
-          <FormItem>
-            <FormLabel>
-              What compliance or regulatory requirements apply to this process? (Select all that
-              apply)
-            </FormLabel>
-            <div className="space-y-2 pt-2">
-              {Options.complianceOptions.map(item => (
-                <FormField
-                  key={item}
-                  name="complianceRequirements"
-                  render={({ field }) => (
-                    <FormItem
-                      key={item}
-                      className="flex flex-row items-start space-x-3 space-y-0"
-                    >
-                      <FormControl>
-                        <Checkbox
-                          checked={field.value?.includes(item)}
-                          onCheckedChange={checked => {
-                            const currentValues = field.value || [];
-                            if (checked) {
-                              field.onChange([...currentValues, item]);
-                            } else {
-                              field.onChange(currentValues.filter(value => value !== item));
-                            }
-                          }}
-                        />
-                      </FormControl>
-                      <FormLabel className="font-normal">{item}</FormLabel>
-                    </FormItem>
-                  )}
-                />
-              ))}
-            </div>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-    </div>
-  </div>
-);
-
-    
-
-    
-
-    

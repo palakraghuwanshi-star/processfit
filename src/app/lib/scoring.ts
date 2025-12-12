@@ -1,4 +1,3 @@
-
 import type { FormValues } from '@/app/lib/schema';
 import type { AnalysisScores } from '@/app/lib/data-store';
 import scoringRules from './scoring-rules.json';
@@ -256,7 +255,8 @@ export const calculateScores = (data: FormValues): { scores: AnalysisScores, fla
     let feasibility = (rawFeasibility / 50) * 30 - feasibilityPenalty;
     feasibility = Math.max(0, Math.round(feasibility));
 
-    const strategicImpact = scoreBottleneck(data.processBottleneck) + scoreComplaints(data.stakeholderComplaints) + scoreGrowthLimitation(data.growthLimitation) + scoreROI(data.expectedROI) + scoreCompliance(data.complianceRequirements);
+    const painPoints = scoreErrorRate(data.errorRate) + scoreDelayImpact(data.impactOfDelays);
+    const strategicImpact = scoreBottleneck(data.processBottleneck) + scoreComplaints(data.stakeholderComplaints) + scoreGrowthLimitation(data.growthLimitation) + scoreROI(data.expectedROI) + scoreCompliance(data.complianceRequirements) + painPoints;
 
     // New Task Complexity Score Calculation
     const complexityScores: (number | null)[] = [

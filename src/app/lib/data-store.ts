@@ -163,4 +163,3 @@ export const getAllAssessments = async (): Promise<AnalysisResult[]> => {
         throw permissionError;
     }
 }
-

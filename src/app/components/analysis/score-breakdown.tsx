@@ -14,7 +14,6 @@ const maxScores = {
     riskCompliance: 30,
     feasibility: 30,
     strategicImpact: 40,
-    taskComplexity: 30,
 };
 
 export function ScoreBreakdown({ scores }: ScoreBreakdownProps) {
@@ -23,7 +22,6 @@ export function ScoreBreakdown({ scores }: ScoreBreakdownProps) {
     { name: "Cost & Efficiency", score: scores.costEfficiency, max: maxScores.costEfficiency },
     { name: "Risk & Compliance", score: scores.riskCompliance, max: maxScores.riskCompliance },
     { name: "Feasibility", score: scores.feasibility, max: maxScores.feasibility },
-    { name: "Task Complexity", score: scores.taskComplexityScore, max: maxScores.taskComplexity },
     { name: "Strategic Impact", score: scores.strategicImpact, max: maxScores.strategicImpact },
   ];
 

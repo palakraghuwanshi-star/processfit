@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 
 interface PriorityMatrixProps {
   businessImpact: number;
-  feasibility: number; // This will now be total feasibility (original + complexity)
+  feasibility: number;
 }
 
 const quadrantConfig = {
@@ -24,7 +24,7 @@ const quadrantConfig = {
 
 export function PriorityMatrix({ businessImpact, feasibility }: PriorityMatrixProps) {
   const maxImpact = 120;
-  const maxFeasibility = 60; // Now includes Task Complexity (30 + 30)
+  const maxFeasibility = 30;
 
   const yPos = 100 - (businessImpact / maxImpact) * 100;
   const xPos = (feasibility / maxFeasibility) * 100;

@@ -646,7 +646,7 @@ const Section3 = () => (
           render={({ field }) => (
             <FormItem>
               <FormLabel>
-                On average, how long does it take to complete one transaction from start to finish?
+                On average, how long does it take to complete one request from start to finish?
               </FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
@@ -670,7 +670,7 @@ const Section3 = () => (
           name="costPerTransaction"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>What is the estimated cost to process a single transaction?</FormLabel>
+              <FormLabel>What is the estimated cost to process a single request?</FormLabel>
               <FormControl>
                 <Input
                   type="number"
@@ -682,8 +682,8 @@ const Section3 = () => (
               </FormControl>
               <FormDescription className="flex items-center gap-1.5">
                 <Info className="h-3 w-3" />
-                Include labor time and overhead for one transaction. If unsure, estimate: (Total
-                monthly process cost) ÷ (Monthly transaction volume)
+                Include labor time and overhead for one request. If unsure, estimate: (Total
+                monthly process cost) ÷ (Monthly request volume)
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -806,7 +806,7 @@ const Section5 = () => (
         render={({ field }) => (
           <FormItem>
             <FormLabel>
-              Approximately what percentage of transactions require rework due to errors?
+              Approximately what percentage of requests require rework due to errors?
             </FormLabel>
             <FormControl>
               <Input
@@ -979,7 +979,7 @@ const Section6 = () => {
             name="processStandardization"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>What percentage of transactions follow the exact same steps?</FormLabel>
+                <FormLabel>What percentage of requests follow the exact same steps?</FormLabel>
                 <FormControl>
                   <Input
                     type="number"
@@ -998,7 +998,7 @@ const Section6 = () => {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>
-                  What percentage of transactions require special handling or don&apos;t follow the
+                  What percentage of requests require special handling or don&apos;t follow the
                   standard process?
                 </FormLabel>
                 <FormControl>

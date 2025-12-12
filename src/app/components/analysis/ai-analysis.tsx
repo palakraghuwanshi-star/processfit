@@ -1,6 +1,6 @@
 'use client';
 
-import type { AnalyzeProcessOutput } from '@/ai/flows/analyze-process-with-ai';
+import type { AnalyzeProcessOutput } from '@/ai/flows/types';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle, AlertTriangle, Forward, Timer } from 'lucide-react';

@@ -16,7 +16,8 @@ import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
 import { Header } from "@/app/components/header";
 import { Progress } from "@/components/ui/progress";
-import { analyzeProcess, type AnalyzeProcessOutput } from "@/ai/flows/analyze-process-with-ai";
+import { analyzeProcess } from "@/ai/flows/analyze-process-with-ai";
+import type { AnalyzeProcessOutput } from "@/ai/flows/types";
 import { AiAnalysis } from "@/app/components/analysis/ai-analysis";
 
 export default function AnalysisPage() {

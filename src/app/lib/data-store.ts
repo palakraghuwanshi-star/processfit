@@ -2,7 +2,7 @@
 'use client';
 
 import type { FormValues } from '@/app/lib/schema';
-import type { AnalyzeProcessOutput } from '@/ai/flows/analyze-process-with-ai';
+import type { AnalyzeProcessOutput } from '@/ai/flows/types';
 import { getFirestore, doc, setDoc, getDoc, updateDoc, serverTimestamp, Timestamp, collectionGroup, getDocs, query } from 'firebase/firestore';
 import { initializeFirebase } from '@/firebase';
 import { FirestorePermissionError } from '@/firebase/errors';

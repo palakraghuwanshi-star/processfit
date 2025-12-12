@@ -2,6 +2,7 @@
 'use client';
 
 import type { FormValues } from '@/app/lib/schema';
+import type { AnalyzeProcessOutput } from '@/ai/flows/analyze-process-with-ai';
 import { getFirestore, doc, setDoc, getDoc, updateDoc, serverTimestamp, Timestamp, collectionGroup, getDocs, query } from 'firebase/firestore';
 import { initializeFirebase } from '@/firebase';
 import { FirestorePermissionError } from '@/firebase/errors';
@@ -24,6 +25,7 @@ export type AnalysisResult = {
     formData: FormValues;
     scores: AnalysisScores;
     flags: string[];
+    aiAnalysis?: AnalyzeProcessOutput;
 };
 
 const getDb = () => {
@@ -110,6 +112,22 @@ export const getAssessment = async (userId: string, id: string): Promise<Analysi
         }
     }
     return undefined;
+};
+
+
+export const updateAssessmentWithAiData = async (userId: string, id: string, aiAnalysis: AnalyzeProcessOutput) => {
+    const db = getDb();
+    const docRef = doc(db, 'users', userId, 'assessments', id);
+    updateDoc(docRef, {
+        aiAnalysis
+    }).catch((error) => {
+        const permissionError = new FirestorePermissionError({
+            path: docRef.path,
+            operation: 'update',
+            requestResourceData: { aiAnalysis },
+        });
+        errorEmitter.emit('permission-error', permissionError);
+    });
 };
 
 export const getAllAssessments = async (): Promise<AnalysisResult[]> => {

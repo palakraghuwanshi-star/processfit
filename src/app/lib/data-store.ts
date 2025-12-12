@@ -11,9 +11,9 @@ import { errorEmitter }from '@/firebase/error-emitter';
 export type AnalysisScores = {
     volumeScale: number;
     costEfficiency: number;
-    riskCompliance: number;
     feasibility: number;
     strategicImpact: number;
+    taskComplexityScore: number;
     businessImpact: number;
     totalScore: number;
     category: string;

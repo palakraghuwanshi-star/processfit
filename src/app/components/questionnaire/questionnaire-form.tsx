@@ -8,7 +8,6 @@ import {
   FileText,
   DollarSign,
   HeartPulse,
-  AlertTriangle,
   Construction,
   TrendingUp,
   Loader2,
@@ -77,11 +76,6 @@ const formSections = [
     fields: ['currentChallenges', 'impactOfDelays', 'biggestPainPoint', 'errorRate'],
   },
   {
-    title: 'Risk & Compliance',
-    icon: AlertTriangle,
-    fields: ['complianceRequirements'],
-  },
-  {
     title: 'Feasibility',
     icon: Construction,
     fields: [
@@ -97,7 +91,7 @@ const formSections = [
   {
     title: 'Strategic Impact',
     icon: TrendingUp,
-    fields: ['processBottleneck', 'stakeholderComplaints', 'growthLimitation', 'expectedROI'],
+    fields: ['processBottleneck', 'stakeholderComplaints', 'growthLimitation', 'expectedROI', 'complianceRequirements'],
   },
 ] as const;
 
@@ -279,7 +273,6 @@ export function QuestionnaireForm() {
               {currentStep === 3 && <Section4 />}
               {currentStep === 4 && <Section5 />}
               {currentStep === 5 && <Section6 />}
-              {currentStep === 6 && <Section7 />}
             </motion.div>
           </AnimatePresence>
 
@@ -817,56 +810,7 @@ const Section4 = () => {
   );
 };
 
-const Section5 = () => (
-  <div>
-    <FormSectionHeader title="Risk & Compliance" />
-    <div className="space-y-6 max-w-lg">
-      <FormField
-        name="complianceRequirements"
-        render={() => (
-          <FormItem>
-            <FormLabel>
-              What compliance or regulatory requirements apply to this process? (Select all that
-              apply)
-            </FormLabel>
-            <div className="space-y-2 pt-2">
-              {Options.complianceOptions.map(item => (
-                <FormField
-                  key={item}
-                  name="complianceRequirements"
-                  render={({ field }) => (
-                    <FormItem
-                      key={item}
-                      className="flex flex-row items-start space-x-3 space-y-0"
-                    >
-                      <FormControl>
-                        <Checkbox
-                          checked={field.value?.includes(item)}
-                          onCheckedChange={checked => {
-                            const currentValues = field.value || [];
-                            if (checked) {
-                              field.onChange([...currentValues, item]);
-                            } else {
-                              field.onChange(currentValues.filter(value => value !== item));
-                            }
-                          }}
-                        />
-                      </FormControl>
-                      <FormLabel className="font-normal">{item}</FormLabel>
-                    </FormItem>
-                  )}
-                />
-              ))}
-            </div>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-    </div>
-  </div>
-);
-
-const Section6 = () => {
+const Section5 = () => {
   const { watch } = useFormContext<FormValues>();
   const documentationStatus = watch('documentationStatus');
   const showDocumentationPercentage = documentationStatus === 'Partially documented';
@@ -1048,7 +992,7 @@ const Section6 = () => {
   );
 };
 
-const Section7 = () => (
+const Section6 = () => (
   <div>
     <FormSectionHeader title="Strategic Impact" />
     <div className="space-y-6 max-w-lg">
@@ -1148,6 +1092,47 @@ const Section7 = () => (
                 ))}
               </SelectContent>
             </Select>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        name="complianceRequirements"
+        render={() => (
+          <FormItem>
+            <FormLabel>
+              What compliance or regulatory requirements apply to this process? (Select all that
+              apply)
+            </FormLabel>
+            <div className="space-y-2 pt-2">
+              {Options.complianceOptions.map(item => (
+                <FormField
+                  key={item}
+                  name="complianceRequirements"
+                  render={({ field }) => (
+                    <FormItem
+                      key={item}
+                      className="flex flex-row items-start space-x-3 space-y-0"
+                    >
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value?.includes(item)}
+                          onCheckedChange={checked => {
+                            const currentValues = field.value || [];
+                            if (checked) {
+                              field.onChange([...currentValues, item]);
+                            } else {
+                              field.onChange(currentValues.filter(value => value !== item));
+                            }
+                          }}
+                        />
+                      </FormControl>
+                      <FormLabel className="font-normal">{item}</FormLabel>
+                    </FormItem>
+                  )}
+                />
+              ))}
+            </div>
             <FormMessage />
           </FormItem>
         )}

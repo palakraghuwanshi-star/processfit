@@ -205,7 +205,6 @@ export const calculateScores = (data: FormValues): { scores: AnalysisScores, fla
     // with a dynamic rules engine that processes scoringRules.json
     const volumeScale = scoreProcessFrequency(data.processFrequency);
     const costEfficiency = scoreTeamEffort(data.teamSize, data.timePercentage) + scoreProcessingTime(data.averageProcessingTime) + scoreTotalMonthlyValue(data.monthlyVolume, data.costPerTransaction);
-    const riskCompliance = scoreErrorRate(data.errorRate) + scoreCompliance(data.complianceRequirements) + scoreDelayImpact(data.impactOfDelays);
     
     let stdScore = scoreStandardization(data.processStandardization);
     const docScore = scoreDocumentation(data.documentationStatus);
@@ -257,7 +256,7 @@ export const calculateScores = (data: FormValues): { scores: AnalysisScores, fla
     let feasibility = (rawFeasibility / 50) * 30 - feasibilityPenalty;
     feasibility = Math.max(0, Math.round(feasibility));
 
-    const strategicImpact = scoreBottleneck(data.processBottleneck) + scoreComplaints(data.stakeholderComplaints) + scoreGrowthLimitation(data.growthLimitation) + scoreROI(data.expectedROI);
+    const strategicImpact = scoreBottleneck(data.processBottleneck) + scoreComplaints(data.stakeholderComplaints) + scoreGrowthLimitation(data.growthLimitation) + scoreROI(data.expectedROI) + scoreCompliance(data.complianceRequirements);
 
     // New Task Complexity Score Calculation
     const complexityScores: (number | null)[] = [
@@ -277,7 +276,7 @@ export const calculateScores = (data: FormValues): { scores: AnalysisScores, fla
     const taskComplexityScore = Math.round((averageComplexityScore / 10) * 30);
 
 
-    const businessImpact = volumeScale + costEfficiency + riskCompliance + strategicImpact;
+    const businessImpact = volumeScale + costEfficiency + strategicImpact;
     const totalFeasibility = feasibility + taskComplexityScore;
     const totalScore = businessImpact + totalFeasibility;
 
@@ -303,7 +302,6 @@ export const calculateScores = (data: FormValues): { scores: AnalysisScores, fla
         scores: {
             volumeScale, 
             costEfficiency, 
-            riskCompliance, 
             feasibility, 
             strategicImpact, 
             taskComplexityScore,
@@ -315,4 +313,3 @@ export const calculateScores = (data: FormValues): { scores: AnalysisScores, fla
         flags
     };
 };
-

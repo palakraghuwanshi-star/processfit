@@ -1,4 +1,3 @@
-
 'use client';
 
 import * as React from 'react';
@@ -75,12 +74,12 @@ const formSections = [
   {
     title: 'Pain Points',
     icon: HeartPulse,
-    fields: ['currentChallenges', 'impactOfDelays', 'biggestPainPoint'],
+    fields: ['currentChallenges', 'impactOfDelays', 'biggestPainPoint', 'errorRate'],
   },
   {
     title: 'Risk & Compliance',
     icon: AlertTriangle,
-    fields: ['errorRate', 'complianceRequirements'],
+    fields: ['complianceRequirements'],
   },
   {
     title: 'Feasibility',
@@ -792,6 +791,27 @@ const Section4 = () => {
             </FormItem>
           )}
         />
+        
+        <FormField
+            name="errorRate"
+            render={({ field }) => (
+            <FormItem>
+                <FormLabel>
+                Approximately what percentage of requests require rework due to errors?
+                </FormLabel>
+                <FormControl>
+                <Input
+                    type="number"
+                    placeholder="e.g., 15"
+                    endIcon="%"
+                    {...field}
+                    value={field.value ?? ''}
+                />
+                </FormControl>
+                <FormMessage />
+            </FormItem>
+            )}
+        />
       </div>
     </div>
   );
@@ -801,26 +821,6 @@ const Section5 = () => (
   <div>
     <FormSectionHeader title="Risk & Compliance" />
     <div className="space-y-6 max-w-lg">
-      <FormField
-        name="errorRate"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>
-              Approximately what percentage of requests require rework due to errors?
-            </FormLabel>
-            <FormControl>
-              <Input
-                type="number"
-                placeholder="e.g., 15"
-                endIcon="%"
-                {...field}
-                value={field.value ?? ''}
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
       <FormField
         name="complianceRequirements"
         render={() => (
@@ -1155,6 +1155,8 @@ const Section7 = () => (
     </div>
   </div>
 );
+
+    
 
     
 

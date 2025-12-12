@@ -315,3 +315,4 @@ export const calculateScores = (data: FormValues): { scores: AnalysisScores, fla
         flags
     };
 };
+

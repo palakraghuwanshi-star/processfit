@@ -16,6 +16,7 @@ import { ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
 import { Header } from "@/app/components/header";
+import { Progress } from "@/components/ui/progress";
 
 export default function AnalysisPage() {
   const { id: analysisId } = useParams() as { id: string };
@@ -24,6 +25,23 @@ export default function AnalysisPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    if (isLoading) {
+      const interval = setInterval(() => {
+        setProgress(prev => {
+          if (prev >= 95) {
+            clearInterval(interval);
+            return 95;
+          }
+          return prev + 5;
+        });
+      }, 2000); // Update every 2 seconds to reach ~100% in 40 seconds
+
+      return () => clearInterval(interval);
+    }
+  }, [isLoading]);
 
   useEffect(() => {
     if (isUserLoading) {
@@ -70,7 +88,14 @@ export default function AnalysisPage() {
   if (isLoading || isUserLoading) {
     return (
         <div className="flex min-h-screen w-full items-center justify-center bg-background">
-            <Loader2 className="h-12 w-12 animate-spin text-primary" />
+            <div className="w-full max-w-md text-center">
+                <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto" />
+                <h1 className="text-2xl font-semibold mt-4">Running Analysis...</h1>
+                <p className="text-muted-foreground mt-2">
+                    Please wait, this can take up to 40 seconds.
+                </p>
+                <Progress value={progress} className="w-full mt-4" />
+            </div>
         </div>
     );
   }
@@ -120,9 +145,9 @@ export default function AnalysisPage() {
         </header>
 
         <main className="p-6 sm:p-8 space-y-12">
-            <ScoreSummary scores={data.scores} totalScore={150} />
+            <ScoreSummary scores={data.scores} totalScore={180} />
             <Separator />
-            <PriorityMatrix businessImpact={data.scores.businessImpact} feasibility={data.scores.feasibility} />
+            <PriorityMatrix businessImpact={data.scores.businessImpact} feasibility={data.scores.feasibility + data.scores.taskComplexityScore} />
             <Separator />
             <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
                 <div className="md:col-span-3">

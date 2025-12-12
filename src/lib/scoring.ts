@@ -278,13 +278,13 @@ export const calculateScores = (data: FormValues): { scores: AnalysisScores, fla
 
 
     const businessImpact = volumeScale + costEfficiency + riskCompliance + strategicImpact;
-    const totalScore = businessImpact + feasibility + taskComplexityScore;
+    const totalFeasibility = feasibility + taskComplexityScore;
+    const totalScore = businessImpact + totalFeasibility;
 
     let category = "";
     let color = "";
     // Note: Max feasibility is now 60 (30 from original + 30 from complexity)
-    const totalFeasibility = feasibility + taskComplexityScore;
-
+    
     if (businessImpact >= 90 && totalFeasibility >= 45) { // Adjusted threshold
         category = "QUICK WIN ⭐";
         color = "green";

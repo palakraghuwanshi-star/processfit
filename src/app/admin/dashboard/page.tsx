@@ -86,7 +86,8 @@ export default function AdminDashboardPage() {
     }
   };
 
-  const getCategoryVariant = (category: string) => {
+  const getCategoryVariant = (category?: string) => {
+    if (!category) return 'outline';
     if (category.includes('QUICK WIN')) return 'default';
     if (category.includes('STRATEGIC')) return 'secondary';
     if (category.includes('INCREMENTAL')) return 'outline';
@@ -149,12 +150,12 @@ export default function AdminDashboardPage() {
                           <TableRow key={assessment.id}>
                             <TableCell className="font-medium">{assessment.formData.processName}</TableCell>
                             <TableCell>
-                              {assessment.submittedAt ? format(new Date(assessment.submittedAt), 'MMM d, yyyy') : 'N/A'}
+                              {assessment.submittedAt ? format(new Date(assessment.submittedAt as any), 'MMM d, yyyy') : 'N/A'}
                             </TableCell>
-                            <TableCell>{assessment.scores.totalScore}</TableCell>
+                            <TableCell>{assessment.scores?.totalScore ?? 'Pending...'}</TableCell>
                             <TableCell>
-                              <Badge variant={getCategoryVariant(assessment.scores.category)}>
-                                {assessment.scores.category}
+                              <Badge variant={getCategoryVariant(assessment.scores?.category)}>
+                                {assessment.scores?.category ?? 'Pending...'}
                               </Badge>
                             </TableCell>
                             <TableCell className="text-right">
@@ -162,6 +163,7 @@ export default function AdminDashboardPage() {
                                 variant="outline"
                                 size="sm"
                                 onClick={() => router.push(`/analysis/${assessment.id}`)}
+                                disabled={!assessment.scores}
                               >
                                 View Report
                               </Button>

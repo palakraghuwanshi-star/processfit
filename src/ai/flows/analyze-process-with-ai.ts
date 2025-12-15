@@ -6,19 +6,46 @@
  */
 
 import { getAi } from '@/ai/genkit';
-import scoringRules from '@/app/lib/scoring-rules.json';
-import { AnalyzeProcessInputSchema, AnalyzeProcessOutputSchema, type AnalyzeProcessInput, type AnalyzeProcessOutput } from './types';
+import {
+  AnalyzeProcessInputSchema,
+  AnalyzeProcessOutputSchema,
+  type AnalyzeProcessInput,
+  type AnalyzeProcessOutput,
+} from './types';
+import fs from 'fs/promises';
+import path from 'path';
 
+// Define a type for the structure of scoring-rules.json
+type ScoringRules = {
+  aiAnalysisPrompt: string;
+  // other properties can be added here if needed
+};
+
+async function getScoringRules(): Promise<ScoringRules> {
+  const filePath = path.join(process.cwd(), 'src', 'app', 'lib', 'scoring-rules.json');
+  const fileContent = await fs.readFile(filePath, 'utf-8');
+  return JSON.parse(fileContent);
+}
 
 export async function analyzeProcess(input: AnalyzeProcessInput): Promise<AnalyzeProcessOutput> {
   return analyzeProcessFlow(input);
 }
 
-const prompt = getAi().definePrompt({
-  name: 'analyzeProcessPrompt',
-  input: { schema: AnalyzeProcessInputSchema },
-  output: { schema: AnalyzeProcessOutputSchema },
-  prompt: `${scoringRules.aiAnalysisPrompt}
+const analyzeProcessFlow = getAi().defineFlow(
+  {
+    name: 'analyzeProcessFlow',
+    inputSchema: AnalyzeProcessInputSchema,
+    outputSchema: AnalyzeProcessOutputSchema,
+  },
+  async (input) => {
+    // Dynamically load the rules on each execution
+    const scoringRules = await getScoringRules();
+
+    const prompt = getAi().definePrompt({
+      name: 'analyzeProcessPrompt',
+      input: { schema: AnalyzeProcessInputSchema },
+      output: { schema: AnalyzeProcessOutputSchema },
+      prompt: `${scoringRules.aiAnalysisPrompt}
 
 Here is the data for the process:
 
@@ -32,15 +59,8 @@ Here is the data for the process:
 {{{json scores}}}
 \`\`\`
 `,
-});
+    });
 
-const analyzeProcessFlow = getAi().defineFlow(
-  {
-    name: 'analyzeProcessFlow',
-    inputSchema: AnalyzeProcessInputSchema,
-    outputSchema: AnalyzeProcessOutputSchema,
-  },
-  async (input) => {
     const { output } = await prompt(input);
     if (!output) {
       throw new Error('The AI model did not return a valid analysis.');

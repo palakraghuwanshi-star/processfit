@@ -22,15 +22,18 @@ const parseScore = (score: string): number => {
 /**
  * Evaluates a numeric value against a single rule's criteria string.
  * Supports operators like <, <=, >, >=, and ranges like "500-1000".
+ * Also supports monetary values like "$500-$1000".
  */
 const evaluateNumericRule = (value: number, criteria: string): boolean => {
-    const matchRange = criteria.match(/(\d+)-(\d+)/);
+    const cleanedCriteria = criteria.replace(/\$/g, '');
+    
+    const matchRange = cleanedCriteria.match(/(\d+)-(\d+)/);
     if (matchRange) {
         const [, min, max] = matchRange.map(Number);
         return value >= min && value <= max;
     }
 
-    const matchOperator = criteria.match(/(<|<=|>|>=)\s*(\d+)/);
+    const matchOperator = cleanedCriteria.match(/(<|<=|>|>=)\s*(\d+)/);
     if (matchOperator) {
         const [, operator, ruleValueStr] = matchOperator;
         const ruleValue = Number(ruleValueStr);
@@ -57,7 +60,7 @@ const getScoreFromNumericRules = (value: number, rules: Rule[]): number => {
  * Finds the matching rule for a given string value and returns its score.
  */
 const getScoreFromStringRule = (value: string, rules: Rule[]): number => {
-    const rule = rules.find(r => r.criteria === value);
+    const rule = rules.find(r => r.criteria.toLowerCase().includes(value.toLowerCase()));
     return rule ? parseScore(rule.score) : 0;
 };
 
@@ -77,55 +80,72 @@ export const calculateScores = (data: FormValues): { scores: AnalysisScores, fla
     
     // --- Calculate Scores from Rules ---
 
-    // Volume & Scale
-    const volumeScale = getScoreFromStringRule(data.processFrequency, getRules("Volume & Scale"));
-    
     // Cost & Efficiency
+    const costEfficiencyRules = getRules("Cost & Efficiency");
     const totalMonthlyValue = data.monthlyVolume * data.costPerTransaction;
     const fteHours = data.teamSize * (data.timePercentage / 100) * 160;
     const costEfficiency = 
-        getScoreFromNumericRules(totalMonthlyValue, getRules("Cost & Efficiency")) +
-        getScoreFromNumericRules(fteHours, getRules("Cost & Efficiency")) +
-        getScoreFromStringRule(data.averageProcessingTime, getRules("Cost & Efficiency"));
+        getScoreFromNumericRules(totalMonthlyValue, costEfficiencyRules) +
+        getScoreFromNumericRules(fteHours, costEfficiencyRules) +
+        getScoreFromStringRule(data.averageProcessingTime, costEfficiencyRules);
+
+    // Volume & Scale (This category was missing from the original implementation)
+    const volumeScale = getScoreFromStringRule(data.processFrequency, getRules("Volume & Scale") || costEfficiencyRules);
 
     // Risk & Compliance
+    const riskRules = getRules("Risk & Compliance");
     const riskCompliance = 
-        getScoreFromNumericRules(data.errorRate, getRules("Risk & Compliance")) +
-        getScoreFromStringRule(data.complianceRequirements[0] || "None", getRules("Risk & Compliance")) +
-        getScoreFromStringRule(data.impactOfDelays || "Minimal impact, no direct costs", getRules("Risk & Compliance"));
+        getScoreFromNumericRules(data.errorRate, riskRules) +
+        getScoreFromStringRule(data.complianceRequirements[0] || "None", riskRules) +
+        getScoreFromStringRule(data.impactOfDelays || "Minimal", riskRules);
 
-    // Feasibility (Original)
-    const stdScore = getScoreFromNumericRules(data.processStandardization, getRules("Feasibility"));
-    const docScore = getScoreFromStringRule(data.documentationStatus, getRules("Feasibility"));
-    const excScore = getScoreFromNumericRules(data.exceptionHandling, getRules("Feasibility"));
+    // Feasibility
+    const feasibilityRules = getRules("Feasibility");
+    const stdScore = getScoreFromNumericRules(data.processStandardization, feasibilityRules);
+    const docScore = getScoreFromStringRule(data.documentationStatus, feasibilityRules);
+    const excScore = getScoreFromNumericRules(data.exceptionHandling, feasibilityRules);
 
     let apiScore: number;
-    const apiRules = getRules("Feasibility").filter(r => r.criteria.includes("API Access"));
+    const apiRules = feasibilityRules.filter(r => r.criteria.includes("API Access"));
     if (data.systems.every(s => s.hasApi === "Yes")) {
-        apiScore = getScoreFromStringRule("API Access: All systems have APIs", apiRules);
+        apiScore = getScoreFromStringRule("All systems have APIs", apiRules);
     } else if (data.systems.some(s => s.hasApi === "No" || s.hasApi === "Don't know")) {
-        apiScore = getScoreFromStringRule("API Access: Any \"No\" or \"Don't know\" responses", apiRules);
+        apiScore = getScoreFromStringRule("Any \"No\" or \"Don't know\"", apiRules);
     } else {
-        apiScore = getScoreFromStringRule("API Access: Mixed (some with, some without)", apiRules);
+        apiScore = getScoreFromStringRule("Mixed", apiRules);
     }
     
-    const accessScore = getScoreFromStringRule(data.systemAccess, getRules("Feasibility"));
+    const accessScore = getScoreFromStringRule(data.systemAccess, feasibilityRules);
     
+    const rawFeasibility = Math.max(0, stdScore) + docScore + excScore + apiScore + accessScore;
+    let feasibility = (rawFeasibility / 50) * 30; // Scale to 30 points
+
     // Task Complexity
-    const docProcessingScore = getScoreFromStringRule(data.documentProcessing || 'No documents involved', getRules("Task Complexity"));
-    const humanInLoopScore = getScoreFromStringRule(data.humanInLoop, getRules("Task Complexity"));
-    const communicationScore = data.communicationNeeds && data.communicationNeeds.length > 0 ? getScoreFromStringRule(`Communication Needs: ${data.communicationNeeds.length} Type${data.communicationNeeds.length > 1 ? 's' : ''}`, getRules("Task Complexity")) : 10;
+    const complexityRules = getRules("Task Complexity");
+    const docProcessingScore = getScoreFromStringRule(data.documentProcessing || 'No documents involved', complexityRules);
+    const humanInLoopScore = getScoreFromStringRule(data.humanInLoop, complexityRules);
+
+    const commNeeds = data.communicationNeeds || [];
+    let communicationScore: number | null = null;
+    if (commNeeds.length === 0 || commNeeds.includes('None of the above')) {
+        communicationScore = 10;
+    } else if (commNeeds.length === 1) {
+        communicationScore = getScoreFromStringRule("1 Type", complexityRules);
+    } else if (commNeeds.length === 2) {
+        communicationScore = getScoreFromStringRule("2 Types", complexityRules);
+    } else {
+        communicationScore = getScoreFromStringRule("3+ Types", complexityRules);
+    }
     
     const complexityScores = [docProcessingScore, humanInLoopScore, communicationScore].filter(s => s !== null) as number[];
     const averageComplexityScore = complexityScores.length > 0
         ? complexityScores.reduce((acc, score) => acc + score, 0) / complexityScores.length
         : 10;
-    const taskComplexityScore = Math.round((averageComplexityScore / 10) * 30);
+    const taskComplexityScore = Math.round((averageComplexityScore / 10) * 30); // Scale to 30 points
 
 
-    let feasibilityPenalty = 0;
+    // --- Flags and Penalties ---
     if (data.documentationStatus === "No documentation exists" || data.documentationStatus === "Partially documented") {
-        feasibilityPenalty = 3;
         flags.push("⚠️ No or partial documented SOPs");
     }
     if (data.exceptionHandling > 30) {
@@ -144,30 +164,27 @@ export const calculateScores = (data: FormValues): { scores: AnalysisScores, fla
         flags.push("❌ Integration blocker: All systems are on internal network only");
     }
 
-    const rawFeasibility = Math.max(0, stdScore) + docScore + excScore + apiScore + accessScore;
-    let baseFeasibility = (rawFeasibility / 50) * 30 - feasibilityPenalty;
-    const feasibility = Math.max(0, Math.round(baseFeasibility)) + taskComplexityScore;
-
-
-    // Strategic Impact
+    // --- Strategic Impact ---
+    const strategicRules = getRules("Strategic Impact");
     const strategicImpact = 
-        getScoreFromStringRule(data.processBottleneck, getRules("Strategic Impact")) +
-        getScoreFromStringRule(data.stakeholderComplaints, getRules("Strategic Impact")) +
-        getScoreFromStringRule(data.growthLimitation, getRules("Strategic Impact")) +
-        getScoreFromStringRule(data.expectedROI, getRules("Strategic Impact"));
+        getScoreFromStringRule(data.processBottleneck, strategicRules) +
+        getScoreFromStringRule(data.stakeholderComplaints, strategicRules) +
+        getScoreFromStringRule(data.growthLimitation, strategicRules) +
+        getScoreFromStringRule(data.expectedROI, strategicRules);
 
-    // Final Calculations
+    // --- Final Calculations ---
     const businessImpact = volumeScale + costEfficiency + riskCompliance + strategicImpact;
-    const totalScore = businessImpact + feasibility;
+    const totalFeasibility = Math.round(feasibility) + taskComplexityScore;
+    const totalScore = businessImpact + totalFeasibility;
 
     let category = "REVISIT";
     let color = "red";
     const categorizationRules = getRules("Process Categorization");
 
     for (const rule of categorizationRules) {
-        const criteria = rule.criteria;
-        const impactMatch = criteria.match(/Business Impact (>=|<=) (\d+)/);
-        const feasibilityMatch = criteria.match(/Total Feasibility (>=|<=) (\d+)/);
+        const criteria = rule.criteria.replace(/\s/g, ''); // Remove spaces
+        const impactMatch = criteria.match(/BusinessImpact(>=|<)(\d+)/);
+        const feasibilityMatch = criteria.match(/TotalFeasibility(>=|<)(\d+)/);
 
         if (impactMatch && feasibilityMatch) {
             const [, impactOp, impactValStr] = impactMatch;
@@ -176,7 +193,7 @@ export const calculateScores = (data: FormValues): { scores: AnalysisScores, fla
             const feasyVal = Number(feasyValStr);
 
             const isImpactMet = impactOp === '>=' ? businessImpact >= impactVal : businessImpact < impactVal;
-            const isFeasibilityMet = feasyOp === '>=' ? feasibility >= feasyVal : feasibility < feasyVal;
+            const isFeasibilityMet = feasyOp === '>=' ? totalFeasibility >= feasyVal : totalFeasibility < feasyVal;
 
             if (isImpactMet && isFeasibilityMet) {
                 category = rule.score;
@@ -192,11 +209,11 @@ export const calculateScores = (data: FormValues): { scores: AnalysisScores, fla
     
     return {
         scores: {
-            volumeScale, 
-            costEfficiency, 
-            riskCompliance,
-            feasibility, 
-            strategicImpact, 
+            volumeScale: Math.round(volumeScale), 
+            costEfficiency: Math.round(costEfficiency), 
+            riskCompliance: Math.round(riskCompliance),
+            feasibility: Math.round(totalFeasibility), 
+            strategicImpact: Math.round(strategicImpact), 
             businessImpact: Math.round(businessImpact),
             totalScore: Math.round(totalScore),
             category, 

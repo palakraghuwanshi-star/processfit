@@ -1,6 +1,4 @@
 
-'use client';
-
 import type { FormValues } from '@/app/lib/schema';
 import type { AnalysisScores } from '@/app/lib/data-store';
 import scoringRules from './scoring-rules.json';
